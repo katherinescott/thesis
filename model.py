@@ -119,7 +119,7 @@ class CondCopy(nn.Module):
                         self.embedding_layer(to_rescale)))).data
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
-    def pointer_softmax(shortlist, location, switch_net):
+    def pointer_softmax(self, shortlist, location, switch_net):
         p_short = shortlist * switch_net
         p_loc = location * (1 - switch_net)
         return torch.cat((p_short, p_loc), 1)
@@ -156,6 +156,6 @@ class CondCopy(nn.Module):
         switch = F.sigmoid(self.switch(context_vectors))
 
         #compute pointer softmax
-        output = pointer_softmax(s_outputs, l_outputs, switch)
+        output = self.pointer_softmax(s_outputs, l_outputs, switch)
 
         return output

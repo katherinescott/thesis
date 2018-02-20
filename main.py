@@ -28,10 +28,10 @@ def train(model, optimizer, data_iter, text_field, args):
         # zero out gradients
         optimizer.zero_grad()
         # get output
-        output = model(context)
+        outputs = model(context)
         # calculate loss
-        loss = loss_function_avg(output, target)
-        total_loss += loss_function_tot(output, target).data.numpy()[0]
+        loss = loss_function_avg(outputs, target)
+        total_loss += loss_function_tot(outputs, target).data.numpy()[0]
         data_size += batch_size
         # calculate gradients
         loss.backward()
@@ -61,9 +61,9 @@ def evaluate(model, data_iter, text_field, args):
         target = batch.target[-1, :]
         batch_size = context.size(0)
         # get model output
-        output = model(context)
+        outputs = model(context)
         # calculate total loss
-        loss = loss_function_tot(output, target)  # loss is already averaged
+        loss = loss_function_tot(outputs, target)  # loss is already averaged
         total_loss += loss.data.numpy()[0]
         data_size += batch_size
 

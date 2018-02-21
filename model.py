@@ -15,7 +15,7 @@ class LBL(nn.Module):
 		#nn.Embedding(num embeddings, embedding dim)
         self.embedding_layer = nn.Embedding(
                 self.vocab_size, self.hidden_size)
-        self.max_norm_embedding().cpu()
+        self.max_norm_embedding()
         # C in the paper // nn.Linear (in features, out features) *doesn't learn additive bias
         self.context_layer = nn.Linear(
                 self.hidden_size * self.context_size,

@@ -29,7 +29,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # zero out gradients
         optimizer.zero_grad()
         # get output
-        output = model(context).cuda()
+        output = model.cuda()(context)
         # calculate loss
         loss = loss_function_avg(output, target)
         total_loss += loss_function_tot(output, target).data.numpy()[0]

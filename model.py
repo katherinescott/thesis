@@ -53,7 +53,7 @@ class LBL(nn.Module):
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
 
-        embeddings = self.embedding_layer(context_words).cuda()
+        embeddings = self.embedding_layer(context_words) #.cuda()
         # sanity check
         assert embeddings.size() == \
             (self.batch_size, self.context_size, self.hidden_size)

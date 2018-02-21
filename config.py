@@ -13,7 +13,7 @@ parser.add_argument("--batch_size", help="batching size",
                     type=int, default=128)
 parser.add_argument("--GPU",
                     help="use GPU optimizer (1 to use GPU, 0 for no GPU)",
-                    type=int, default=1)
+                    type=int, default=0)
 parser.add_argument("--mode", help="specify test, validate, or train",
                     type=str, default="test")
 parser.add_argument("--lr", help="learning rate",
@@ -24,7 +24,7 @@ parser.add_argument("--adapt_lr_epoch",
 parser.add_argument("--initial_lr", help="initial learning rate",
                     type=float, default=0.001)
 parser.add_argument("--dropout", help="Dropout rate",
-                    type=float, default=0.00028)
+                    type=float, default=0.5)
 parser.add_argument("--l2", help="L2 Regularization (weight decay)",
                     type=float, default=1e-5)
 parser.add_argument("--optimizer", help="Optimizer type",

@@ -3,14 +3,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from torch.autograd import Variable
-import torch.cuda
 
 class LBL(nn.Module):
-    def __init__(self, pretrained_embeds, context_size, dropout=0.):
+    def __init__(self, pretrained_embeds, context_size, dropout=0.5):
         super(LBL, self).__init__()
         # n in the paper
         self.context_size = context_size
-        self.hidden_size = pretrained_embeds.size(1)
+        self.hidden_size = 1500 #pretrained_embeds.size(1)
         self.vocab_size = pretrained_embeds.size(0)
 		
 		#nn.Embedding(num embeddings, embedding dim)
@@ -38,18 +37,18 @@ class LBL(nn.Module):
 	#torch.norm(input tensor, p=2, dim) p = exponent val in norm formulation, dim = dimension to reduce
     #make sure weights never exceeds a certain threshold 
     def max_norm_embedding(self, max_norm=1):
-        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
+        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1).cuda()
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
                 np.where(norms.data.numpy() > max_norm)[0])).cuda()
-        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).cuda().data
+        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data.cuda()
         scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(
-                        self.embedding_layer(to_rescale)))).cuda().data
+                        self.embedding_layer(to_rescale)))).data.cuda()
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
     def forward(self, context_words):
-        self.batch_size = context_words.size(0)
+        self.batch_size = context_words.size(0).cuda()
         assert context_words.size(1) == self.context_size, \
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
@@ -72,11 +71,11 @@ class LBL(nn.Module):
 #Conditional Copy Model
 
 class CondCopy(nn.Module):
-    def __init__(self, pretrained_embeds, context_size, dropout=0.):
+    def __init__(self, pretrained_embeds, context_size, dropout=0.5):
         super(CondCopy, self).__init__()
         # n in the paper
         self.context_size = context_size
-        self.hidden_size = pretrained_embeds.size(1)
+        self.hidden_size = 1500 #pretrained_embeds.size(1) 
         self.vocab_size = pretrained_embeds.size(0)
         
         #nn.Embedding(num embeddings, embedding dim)
@@ -110,14 +109,14 @@ class CondCopy(nn.Module):
     #torch.norm(input tensor, p=2, dim) p = exponent val in norm formulation, dim = dimension to reduce
     #make sure weights never exceeds a certain threshold 
     def max_norm_embedding(self, max_norm=1):
-        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
+        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1).cuda()
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
-                np.where(norms.data.numpy() > max_norm)[0])).cuda()
-        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).cuda().data
+                np.where(norms.data.numpy() > max_norm)[0]))
+        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data.cuda()
         scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(
-                        self.embedding_layer(to_rescale)))).cuda().data
+                        self.embedding_layer(to_rescale)))).data.cuda()
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
     def pointer_softmax(self, shortlist, location, switch_net):
@@ -126,7 +125,7 @@ class CondCopy(nn.Module):
         return torch.cat((p_short, p_loc), 1)
 
     def forward(self, context_words):
-        self.batch_size = context_words.size(0)
+        self.batch_size = context_words.size(0).cuda()
         assert context_words.size(1) == self.context_size, \
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)

@@ -97,19 +97,19 @@ def main():
     embedding_dim = (model.vocab_size, model.hidden_size)
     if args.init_weights == 'rand_norm':
         model.embedding_layer.weight.data = \
-            torch.cuda.Tensor(np.random.normal(size=embedding_dim))
+            Tensor(np.random.normal(size=embedding_dim))
         print('Initializing random normal weights for embedding')
     elif args.init_weights == 'rand_unif':
         model.embedding_layer.weight.data = \
-            torch.cuda.Tensor(np.random.uniform(size=embedding_dim))
+            Tensor(np.random.uniform(size=embedding_dim))
         print('Initializing random uniform weights for embedding')
     elif args.init_weights == 'ones':
         model.embedding_layer.weight.data = \
-            torch.cuda.Tensor(np.ones(shape=embedding_dim))
+            Tensor(np.ones(shape=embedding_dim))
         print('Initializing all ones as weights for embedding')
     elif args.init_weights == 'zeroes':
         model.embedding_layer.weight.data = \
-            torch.cuda.Tensor(np.zeros(shape=embedding_dim))
+            Tensor(np.zeros(shape=embedding_dim))
         print('Initializing all zeroes as weights for embedding')
     else:
         raise ValueError('{} is not a valid embedding weight \

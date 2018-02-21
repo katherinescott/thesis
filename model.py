@@ -15,7 +15,7 @@ class LBL(nn.Module):
 		#nn.Embedding(num embeddings, embedding dim)
         self.embedding_layer = nn.Embedding(
                 self.vocab_size, self.hidden_size)
-        self.max_norm_embedding().cuda()
+        self.max_norm_embedding().cpu()
         # C in the paper // nn.Linear (in features, out features) *doesn't learn additive bias
         self.context_layer = nn.Linear(
                 self.hidden_size * self.context_size,
@@ -37,14 +37,14 @@ class LBL(nn.Module):
 	#torch.norm(input tensor, p=2, dim) p = exponent val in norm formulation, dim = dimension to reduce
     #make sure weights never exceeds a certain threshold 
     def max_norm_embedding(self, max_norm=1):
-        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1).cuda()
+        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
-                np.where(norms.data.cpu().numpy() > max_norm)[0])).cuda()
-        norms = torch.norm(self.embedding_layer(to_rescale).cuda(), p=2, dim=1).data.cuda()
+                np.where(norms.data.numpy() > max_norm)[0]))
+        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data
         scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(
-                        self.embedding_layer(to_rescale)))).data.cuda()
+                        self.embedding_layer(to_rescale)))).data
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
     def forward(self, context_words):

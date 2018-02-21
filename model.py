@@ -58,7 +58,7 @@ class LBL(nn.Module):
         assert embeddings.size() == \
             (self.batch_size, self.context_size, self.hidden_size)
         context_vectors = self.context_layer(embeddings.view(
-                self.batch_size, self.context_size * self.hidden_size)).cuda()
+                self.batch_size, self.context_size * self.hidden_size))
         context_vectors = self.dropout(context_vectors)
         assert context_vectors.size() == (self.batch_size, self.hidden_size)
         raw_outputs = self.output_layer(context_vectors)

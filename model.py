@@ -48,12 +48,12 @@ class LBL(nn.Module):
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
     def forward(self, context_words):
-        self.batch_size = context_words.cuda().size(0)
+        self.batch_size = context_words.size(0) #take out .cuda() on context words
         assert context_words.size(1) == self.context_size, \
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
 
-        embeddings = self.embedding_layer(context_words.cuda()).cuda()
+        embeddings = self.embedding_layer(context_words)
         # sanity check
         assert embeddings.size() == \
             (self.batch_size, self.context_size, self.hidden_size)

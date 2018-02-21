@@ -80,8 +80,8 @@ def evaluate(model, data_iter, text_field, args):
 
 def main():
     train_iter, val_iter, test_iter, text_field = utils.load_ptb(
-        ptb_path='data3.zip',
-        ptb_dir='data3',
+        ptb_path='data.zip',
+        ptb_dir='data',
         bptt_len=args.context_size,
         batch_size=args.batch_size,
         gpu=args.GPU,
@@ -96,19 +96,19 @@ def main():
     embedding_dim = (model.vocab_size, model.hidden_size)
     if args.init_weights == 'rand_norm':
         model.embedding_layer.weight.data = \
-            Tensor(np.random.normal(size=embedding_dim))
+            cuda.Tensor(np.random.normal(size=embedding_dim))
         print('Initializing random normal weights for embedding')
     elif args.init_weights == 'rand_unif':
         model.embedding_layer.weight.data = \
-            Tensor(np.random.uniform(size=embedding_dim))
+            cuda.Tensor(np.random.uniform(size=embedding_dim))
         print('Initializing random uniform weights for embedding')
     elif args.init_weights == 'ones':
         model.embedding_layer.weight.data = \
-            Tensor(np.ones(shape=embedding_dim))
+            cuda.Tensor(np.ones(shape=embedding_dim))
         print('Initializing all ones as weights for embedding')
     elif args.init_weights == 'zeroes':
         model.embedding_layer.weight.data = \
-            Tensor(np.zeros(shape=embedding_dim))
+            cuda.Tensor(np.zeros(shape=embedding_dim))
         print('Initializing all zeroes as weights for embedding')
     else:
         raise ValueError('{} is not a valid embedding weight \

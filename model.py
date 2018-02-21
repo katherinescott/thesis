@@ -15,7 +15,7 @@ class LBL(nn.Module):
 		#nn.Embedding(num embeddings, embedding dim)
         self.embedding_layer = nn.Embedding(
                 self.vocab_size, self.hidden_size)
-        self.max_norm_embedding()
+        self.max_norm_embedding().cuda()
         # C in the paper // nn.Linear (in features, out features) *doesn't learn additive bias
         self.context_layer = nn.Linear(
                 self.hidden_size * self.context_size,
@@ -41,7 +41,7 @@ class LBL(nn.Module):
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
                 np.where(norms.data.cpu().numpy() > max_norm)[0])).cuda()
-        norms = torch.norm(self.embedding_layer(to_rescale).cuda(), p=2, dim=1).data
+        norms = torch.norm(self.embedding_layer(to_rescale).cuda(), p=2, dim=1).data.cuda()
         scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(
                         self.embedding_layer(to_rescale)))).data.cuda()

@@ -54,12 +54,12 @@ class LBL(nn.Module):
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
 
-        embeddings = self.embedding_layer(context_words)
+        embeddings = self.embedding_layer(context_words).cuda()
         # sanity check
         assert embeddings.size() == \
             (self.batch_size, self.context_size, self.hidden_size)
         context_vectors = self.context_layer(embeddings.view(
-                self.batch_size, self.context_size * self.hidden_size))
+                self.batch_size, self.context_size * self.hidden_size)).cuda()
         context_vectors = self.dropout(context_vectors)
         assert context_vectors.size() == (self.batch_size, self.hidden_size)
         raw_outputs = self.output_layer(context_vectors)
@@ -114,10 +114,10 @@ class CondCopy(nn.Module):
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
                 np.where(norms.data.numpy() > max_norm)[0])).cuda()
-        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data
+        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).cuda().data
         scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(
-                        self.embedding_layer(to_rescale)))).data.cuda()
+                        self.embedding_layer(to_rescale)))).cuda().data
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
     def pointer_softmax(self, shortlist, location, switch_net):
@@ -132,14 +132,14 @@ class CondCopy(nn.Module):
             (context_words.size(), self.context_size)
 
         #embedding layer
-        embeddings = self.embedding_layer(context_words)
+        embeddings = self.embedding_layer(context_words).cuda()
         # sanity check
         assert embeddings.size() == \
             (self.batch_size, self.context_size, self.hidden_size)
         
         #get context vectors
         context_vectors = self.context_layer(embeddings.view(
-                self.batch_size, self.context_size * self.hidden_size))
+                self.batch_size, self.context_size * self.hidden_size)).cuda()
         context_vectors = self.dropout(context_vectors)
         assert context_vectors.size() == (self.batch_size, self.hidden_size)
         

@@ -40,7 +40,7 @@ class LBL(nn.Module):
         norms = torch.norm(self.embedding_layer.weight, p=2, dim=1).cuda()
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
-                np.where(norms.data.numpy() > max_norm)[0])).cpu()
+                np.where(norms.data.cpu().numpy() > max_norm)[0])).cuda()
         norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data.cuda()
         scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(
@@ -112,7 +112,7 @@ class CondCopy(nn.Module):
         norms = torch.norm(self.embedding_layer.weight, p=2, dim=1).cuda()
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
-                np.where(norms.data.numpy() > max_norm)[0])).cpu()
+                np.where(norms.data.cpu().numpy() > max_norm)[0])).cuda()
         norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data.cuda()
         scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(

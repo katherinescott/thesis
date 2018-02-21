@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from torch.autograd import Variable
+import torch.cuda
 
 class LBL(nn.Module):
     def __init__(self, pretrained_embeds, context_size, dropout=0.):

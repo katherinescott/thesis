@@ -10,6 +10,7 @@ import utils
 from config import args
 from model import LBL, CondCopy
 from torch import Tensor
+import torch.cuda
 
 
 def train(model, optimizer, data_iter, text_field, args):
@@ -28,7 +29,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # zero out gradients
         optimizer.zero_grad()
         # get output
-        output = model(context)
+        output = model(context).cuda()
         # calculate loss
         loss = loss_function_avg(outputs, target)
         total_loss += loss_function_tot(output, target).data.numpy()[0]
@@ -61,7 +62,7 @@ def evaluate(model, data_iter, text_field, args):
         target = batch.target[-1, :]
         batch_size = context.size(0)
         # get model output
-        output = model(context)
+        output = model(context).cuda()
         # calculate total loss
         loss = loss_function_tot(output, target)  # loss is already averaged
         total_loss += loss.data.numpy()[0]
@@ -96,19 +97,19 @@ def main():
     embedding_dim = (model.vocab_size, model.hidden_size)
     if args.init_weights == 'rand_norm':
         model.embedding_layer.weight.data = \
-            cuda.Tensor(np.random.normal(size=embedding_dim))
+            torch.cuda.Tensor(np.random.normal(size=embedding_dim))
         print('Initializing random normal weights for embedding')
     elif args.init_weights == 'rand_unif':
         model.embedding_layer.weight.data = \
-            cuda.Tensor(np.random.uniform(size=embedding_dim))
+            torch.cuda.Tensor(np.random.uniform(size=embedding_dim))
         print('Initializing random uniform weights for embedding')
     elif args.init_weights == 'ones':
         model.embedding_layer.weight.data = \
-            cuda.Tensor(np.ones(shape=embedding_dim))
+            torch.cuda.Tensor(np.ones(shape=embedding_dim))
         print('Initializing all ones as weights for embedding')
     elif args.init_weights == 'zeroes':
         model.embedding_layer.weight.data = \
-            cuda.Tensor(np.zeros(shape=embedding_dim))
+            torch.cuda.Tensor(np.zeros(shape=embedding_dim))
         print('Initializing all zeroes as weights for embedding')
     else:
         raise ValueError('{} is not a valid embedding weight \

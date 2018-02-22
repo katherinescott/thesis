@@ -32,7 +32,7 @@ def train(model, optimizer, data_iter, text_field, args):
         output = model(context).cuda()
         # calculate loss
         loss = loss_function_avg(output, target)
-        total_loss += loss_function_tot(output.cuda(), target).data.numpy()[0]
+        total_loss += loss_function_tot(output, target).data.numpy()[0]
         data_size += batch_size
         # calculate gradients
         loss.backward()

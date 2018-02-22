@@ -39,13 +39,16 @@ class LBL(nn.Module):
     def max_norm_embedding(self, max_norm=1):
         norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
         #filter out vals where norm > max norm
-        to_rescale = Variable(torch.from_numpy(
-                np.where(norms.data.cpu().numpy() > max_norm)[0]))
-        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data
-        scaled = self.embedding_layer(to_rescale).div(
+        if len(norms)>0:
+            to_rescale = Variable(torch.from_numpy(
+                np.where(norms.data.numpy() > max_norm)[0]))
+            norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data
+            scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(
                         self.embedding_layer(to_rescale)))).data
-        self.embedding_layer.weight.data[to_rescale.long().data] = scaled
+            self.embedding_layer.weight.data[to_rescale.long().data] = scaled
+        else: self.embedding_layer.weight.data[to_rescale.long().data] = norms.data.numpy()
+
 
     def forward(self, context_words):
         self.batch_size = context_words.size(0)

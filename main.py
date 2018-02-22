@@ -32,7 +32,7 @@ def train(model, optimizer, data_iter, text_field, args):
         output = model(context).cuda()
         # calculate loss
         loss = loss_function_avg(output, target)
-        total_loss += loss_function_tot(output, target).data.numpy()[0]
+        total_loss += loss_function_tot(output, target).data.cpu().numpy()[0]
         data_size += batch_size
         # calculate gradients
         loss.backward()
@@ -59,7 +59,7 @@ def evaluate(model, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        target = batch.target[-1, :]
+        target = batch.target[-1, :].cuda()
         batch_size = context.size(0)
         # get model output
         output = model(context).cuda()

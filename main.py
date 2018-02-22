@@ -58,7 +58,7 @@ def evaluate(model, data_iter, text_field, args):
     iter_len = len(data_iter)
     batch_idx = 0
     for batch in data_iter:
-        context = torch.transpose(batch.text, 0, 1).cuda()
+        context = torch.transpose(batch.text, 0, 1)
         target = batch.target[-1, :]
         batch_size = context.size(0)
         # get model output

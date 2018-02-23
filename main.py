@@ -37,7 +37,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # calculate gradients
         loss.backward()
         # update parameters
-        optimizer.step()
+        optimizer.cuda().step()
         # enforce the max_norm constraint
         model.max_norm_embedding()
         # skip the last batch

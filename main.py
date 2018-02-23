@@ -24,7 +24,7 @@ def train(model, optimizer, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        target = batch.target[-1, :].cuda()
+        target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
         # zero out gradients
         optimizer.zero_grad()
@@ -37,7 +37,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # calculate gradients
         loss.backward()
         # update parameters
-        optimizer.step().cuda()
+        optimizer.step()
         # enforce the max_norm constraint
         model.max_norm_embedding()
         # skip the last batch

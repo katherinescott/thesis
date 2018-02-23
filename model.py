@@ -5,7 +5,7 @@ import numpy as np
 from torch.autograd import Variable
 
 class LBL(nn.Module):
-    def __init__(self, pretrained_embeds, context_size, dropout=0.5):
+    def __init__(self, pretrained_embeds, context_size, dropout=0.):
         super(LBL, self).__init__()
         # n in the paper
         self.context_size = context_size
@@ -37,17 +37,15 @@ class LBL(nn.Module):
 	#torch.norm(input tensor, p=2, dim) p = exponent val in norm formulation, dim = dimension to reduce
     #make sure weights never exceeds a certain threshold 
     def max_norm_embedding(self, max_norm=1):
-        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
+        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1).cuda()
         #filter out vals where norm > max norm
-        if len(norms)>0:
-            to_rescale = Variable(torch.from_numpy(
-                np.where(norms.data.numpy() > max_norm)[0]))
-            norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data
-            scaled = self.embedding_layer(to_rescale).div(
+        to_rescale = Variable(torch.from_numpy(
+                np.where(norms.data.cpu().numpy() > max_norm)[0])).cuda()
+        norms = torch.norm(self.embedding_layer(to_rescale).cuda(), p=2, dim=1).cuda().data
+        scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(
-                        self.embedding_layer(to_rescale)))).data
-            self.embedding_layer.weight.data[to_rescale.long().data] = scaled
-        else: self.embedding_layer.weight.data[to_rescale.long().data] = norms.data.numpy()
+                        self.embedding_layer(to_rescale)))).data.cuda()
+        self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
 
     def forward(self, context_words):
@@ -74,7 +72,7 @@ class LBL(nn.Module):
 #Conditional Copy Model
 
 class CondCopy(nn.Module):
-    def __init__(self, pretrained_embeds, context_size, dropout=0.5):
+    def __init__(self, pretrained_embeds, context_size, dropout=0.):
         super(CondCopy, self).__init__()
         # n in the paper
         self.context_size = context_size

@@ -31,11 +31,11 @@ def train(model, optimizer, data_iter, text_field, args):
         # get output
         output = model(context).cuda()
         # calculate loss
-        loss = loss_function_avg(output, target).cuda()
+        loss = loss_function_avg(output, target)
         total_loss += loss_function_tot(output, target).data.cpu().numpy()[0]
         data_size += batch_size
         # calculate gradients
-        loss.backward().cuda()
+        loss.backward()
         # update parameters
         optimizer.step()
         # enforce the max_norm constraint
@@ -64,7 +64,7 @@ def evaluate(model, data_iter, text_field, args):
         # get model output
         output = model(context).cuda()
         # calculate total loss
-        loss = loss_function_tot(output, target).cuda()  # loss is already averaged
+        loss = loss_function_tot(output, target)  # loss is already averaged
         total_loss += loss.data.numpy()[0]
         data_size += batch_size
 

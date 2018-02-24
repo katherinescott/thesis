@@ -76,7 +76,7 @@ class CondCopy(nn.Module):
         super(CondCopy, self).__init__()
         # n in the paper
         self.context_size = context_size
-        self.hidden_size = 1500 #pretrained_embeds.size(1) 
+        self.hidden_size = pretrained_embeds.size(1)
         self.vocab_size = pretrained_embeds.size(0)
         
         #nn.Embedding(num embeddings, embedding dim)
@@ -110,14 +110,14 @@ class CondCopy(nn.Module):
     #torch.norm(input tensor, p=2, dim) p = exponent val in norm formulation, dim = dimension to reduce
     #make sure weights never exceeds a certain threshold 
     def max_norm_embedding(self, max_norm=1):
-        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1).cuda()
+        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
-                np.where(norms.data.cpu().numpy() > max_norm)[0])).cuda()
-        norms = torch.norm(self.embedding_layer(to_rescale).cuda(), p=2, dim=1).cuda().data
+                np.where(norms.data.cpu().numpy() > max_norm)[0]))
+        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data
         scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(
-                        self.embedding_layer(to_rescale)))).data.cuda()
+                        self.embedding_layer(to_rescale)))).data
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
     def pointer_softmax(self, shortlist, location, switch_net):
@@ -126,20 +126,20 @@ class CondCopy(nn.Module):
         return torch.cat((p_short, p_loc), 1)
 
     def forward(self, context_words):
-        self.batch_size = context_words.size(0).cuda()
+        self.batch_size = context_words.size(0)
         assert context_words.size(1) == self.context_size, \
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
 
         #embedding layer
-        embeddings = self.embedding_layer(context_words).cuda()
+        embeddings = self.embedding_layer(context_words)
         # sanity check
         assert embeddings.size() == \
             (self.batch_size, self.context_size, self.hidden_size)
         
         #get context vectors
         context_vectors = self.context_layer(embeddings.view(
-                self.batch_size, self.context_size * self.hidden_size)).cuda()
+                self.batch_size, self.context_size * self.hidden_size))
         context_vectors = self.dropout(context_vectors)
         assert context_vectors.size() == (self.batch_size, self.hidden_size)
         

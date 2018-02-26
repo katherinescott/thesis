@@ -76,7 +76,7 @@ class CondCopy(nn.Module):
         super(CondCopy, self).__init__()
         # n in the paper
         self.context_size = context_size
-        self.hidden_size = pretrained_embeds.size(1)
+        self.hidden_size = pretrained_embeds.size(1)*3
         self.vocab_size = pretrained_embeds.size(0)
         
         #nn.Embedding(num embeddings, embedding dim)

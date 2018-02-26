@@ -9,7 +9,7 @@ class LBL(nn.Module):
         super(LBL, self).__init__()
         # n in the paper
         self.context_size = context_size
-        self.hidden_size = pretrained_embeds.size(1)
+        self.hidden_size = 600 #pretrained_embeds.size(1)
         self.vocab_size = pretrained_embeds.size(0)
 		
 		#nn.Embedding(num embeddings, embedding dim)

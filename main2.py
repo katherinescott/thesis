@@ -2,6 +2,10 @@ from __future__ import print_function
 
 import os
 
+rom __future__ import print_function
+
+import os
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -24,15 +28,15 @@ def train(model, optimizer, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        target = batch.target[-1, :]
+        target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
         # zero out gradients
         optimizer.zero_grad()
         # get output
-        output = model(context)
+        output = model(context).cuda()
         # calculate loss
         loss = loss_function_avg(output, target)
-        total_loss += loss_function_tot(output, target).data.numpy()[0]
+        total_loss += loss_function_tot(output, target).data.cpu().numpy()[0]
         data_size += batch_size
         # calculate gradients
         loss.backward()
@@ -59,13 +63,13 @@ def evaluate(model, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        target = batch.target[-1, :]
+        target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
         # get model output
-        output = model(context)
+        output = model(context).cuda()
         # calculate total loss
         loss = loss_function_tot(output, target)  # loss is already averaged
-        total_loss += loss.data.numpy()[0]
+        total_loss += loss.data.cpu().numpy()[0]
         data_size += batch_size
 
         # skip last batch
@@ -81,8 +85,8 @@ def evaluate(model, data_iter, text_field, args):
 
 def main():
     train_iter, val_iter, test_iter, text_field = utils.load_ptb(
-        ptb_path='data.zip',
-        ptb_dir='data',
+        ptb_path='data3.zip',
+        ptb_dir='data3',
         bptt_len=args.context_size,
         batch_size=args.batch_size,
         gpu=args.GPU,
@@ -97,24 +101,24 @@ def main():
     embedding_dim = (model.vocab_size, model.hidden_size)
     if args.init_weights == 'rand_norm':
         model.embedding_layer.weight.data = \
-            torch.cuda.Tensor(np.random.normal(size=embedding_dim))
+            Tensor(np.random.normal(size=embedding_dim))
         print('Initializing random normal weights for embedding')
     elif args.init_weights == 'rand_unif':
         model.embedding_layer.weight.data = \
-            torch.cuda.Tensor(np.random.uniform(size=embedding_dim))
+            Tensor(np.random.uniform(size=embedding_dim))
         print('Initializing random uniform weights for embedding')
     elif args.init_weights == 'ones':
         model.embedding_layer.weight.data = \
-            torch.cuda.Tensor(np.ones(shape=embedding_dim))
+            Tensor(np.ones(shape=embedding_dim))
         print('Initializing all ones as weights for embedding')
     elif args.init_weights == 'zeroes':
         model.embedding_layer.weight.data = \
-            torch.cuda.Tensor(np.zeros(shape=embedding_dim))
+            Tensor(np.zeros(shape=embedding_dim))
         print('Initializing all zeroes as weights for embedding')
     else:
         raise ValueError('{} is not a valid embedding weight \
                           initializer'.format(args.init_weights))
-    model.output_shortlist.weight.data = model.embedding_layer.weight.data
+    model.output_layer.weight.data = model.embedding_layer.weight.data
 
     # Specify optimizer
     if args.optimizer == "Adamax":

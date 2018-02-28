@@ -22,7 +22,7 @@ class LBL(nn.Module):
                 self.hidden_size, bias=False)
         # dot product + bias in the paper
         self.output_layer =\
-            nn.Linear(self.hidden_size, (self.vocab_size)
+            nn.Linear(self.hidden_size, self.vocab_size)
 
         self.dropout = nn.Dropout(p=dropout)
 

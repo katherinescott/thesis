@@ -110,8 +110,8 @@ class CondCopy(nn.Module):
     #torch.norm(input tensor, p=2, dim) p = exponent val in norm formulation, dim = dimension to reduce
     #make sure weights never exceeds a certain threshold 
     def max_norm_embedding(self, max_norm=1):
-        print(self.embedding_layer.weight)
         norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
+        print(norms.size())
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
                 np.where(norms.data.cpu().numpy() > max_norm)[0]))

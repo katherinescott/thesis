@@ -92,7 +92,7 @@ class CondCopy(nn.Module):
             nn.Linear(self.hidden_size, self.vocab_size)
 
         self.output_location =\
-            nn.Linear(self.hidden_size, self.context_size) #or context size
+            nn.Linear(self.hidden_size, self.hidden_size) #or context size
 
         self.switch =\
             nn.Linear(self.hidden_size, 1)

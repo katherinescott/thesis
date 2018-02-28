@@ -22,7 +22,7 @@ class LBL(nn.Module):
                 self.hidden_size, bias=False)
         # dot product + bias in the paper
         self.output_layer =\
-            nn.Linear(self.hidden_size, self.vocab_size)
+            nn.Linear(self.hidden_size, (self.vocab_size)
 
         self.dropout = nn.Dropout(p=dropout)
 
@@ -76,7 +76,7 @@ class CondCopy(nn.Module):
         super(CondCopy, self).__init__()
         # n in the paper
         self.context_size = context_size
-        self.hidden_size = pretrained_embeds.size(1)*3
+        self.hidden_size = pretrained_embeds.size(1)
         self.vocab_size = pretrained_embeds.size(0)
         
         #nn.Embedding(num embeddings, embedding dim)
@@ -92,7 +92,7 @@ class CondCopy(nn.Module):
             nn.Linear(self.hidden_size, self.vocab_size)
 
         self.output_location =\
-            nn.Linear(self.hidden_size, self.hidden_size) #or context size
+            nn.Linear(self.hidden_size, self.context_size) #or context size
 
         self.switch =\
             nn.Linear(self.hidden_size, 1)

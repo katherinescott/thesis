@@ -113,7 +113,7 @@ class CondCopy(nn.Module):
         norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
-                np.where(norms.data.cpu().numpy() > max_norm)))
+                np.where(norms.data.cpu().numpy() > max_norm)[0]))
         norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data
         scaled = self.embedding_layer(to_rescale).div(
                 Variable(norms.view(len(to_rescale), 1).expand_as(

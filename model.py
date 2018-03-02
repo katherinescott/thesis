@@ -81,7 +81,7 @@ class CondCopy(nn.Module):
         
         #nn.Embedding(num embeddings, embedding dim)
         self.embedding_layer = nn.Embedding(
-                self.vocab_size, self.hidden_size)
+                self.vocab_size, self.hidden_size, max_norm=1, norm_type=2)
         self.max_norm_embedding()
         # C in the paper // nn.Linear (in features, out features) *doesn't learn additive bias
         self.context_layer = nn.Linear(
@@ -113,7 +113,7 @@ class CondCopy(nn.Module):
         #embeds_weight = torch.squeeze(self.embedding_layer.weight)
         norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
         #norms = torch.unsqueeze(norms, 0) #or squeeze?
-        norms = norms.expand(1, -1, 1)
+        norms = norms.expand(1, -1)
         #print(norms.size())
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(

@@ -39,7 +39,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # update parameters
         optimizer.step()
         # enforce the max_norm constraint
-        model.max_norm_embedding()
+        #model.max_norm_embedding()
         # skip the last batch
         if batch_idx >= iter_len - 2:
             break

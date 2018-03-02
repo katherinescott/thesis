@@ -92,7 +92,7 @@ class CondCopy(nn.Module):
             nn.Linear(self.hidden_size, self.vocab_size)
 
         self.output_location =\
-            nn.Linear(self.hidden_size, self.hidden_size) #or context size
+            nn.Linear(self.hidden_size, self.context_size) #or context size
 
         self.switch =\
             nn.Linear(self.hidden_size, 1)
@@ -127,7 +127,7 @@ class CondCopy(nn.Module):
     def pointer_softmax(self, shortlist, location, switch_net):
         p_short = shortlist * switch_net
         p_loc = location * (1 - switch_net)
-        return torch.cat((p_short, p_loc), 1)
+        return torch.cat((p_short, p_loc), dim=0)
 
     def forward(self, context_words):
         self.batch_size = context_words.size(0)

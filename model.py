@@ -111,7 +111,7 @@ class CondCopy(nn.Module):
     #make sure weights never exceeds a certain threshold 
     def max_norm_embedding(self, max_norm=1):
         norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
-        norms = torch.unsqueeze(norms, 1) #or squeeze?
+        norms = torch.unsqueeze(norms, 0) #or squeeze?
         #filter out vals where norm > max norm
         to_rescale = Variable(torch.from_numpy(
                 np.where(norms.data.cpu().numpy() > max_norm)[0]))

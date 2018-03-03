@@ -93,7 +93,7 @@ class CondCopy(nn.Module):
 
         self.location =\
             nn.RNN(
-                self.hidden_size, self.context_size, num_layers=1, batch_first=False, 
+                self.hidden_size * self.context_size, self.context_size, num_layers=1, batch_first=False, 
                 bidirectional=True) #or context size
 
         self.switch =\
@@ -128,8 +128,8 @@ class CondCopy(nn.Module):
 
     def pointer_softmax(self, shortlist, location, switch_net):
         #location = location.expand_as(shortlist)
-        p_short = torch.mul(shortlist, switch_net.expand_as(shortlist))
-        p_loc = torch.mul(location, (1 - switch_net.expand_as(location)))
+        p_short = torch.mul(shortlist, (1 - switch_net.expand_as(shortlist)))
+        p_loc = torch.mul(location, switch_net.expand_as(location))
         return torch.cat((p_short, p_loc), dim=1)
 
     def forward(self, context_words):
@@ -157,8 +157,9 @@ class CondCopy(nn.Module):
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
         #print(list(s_outputs.size()))
 
-        #location softmax
-        #location, hidden = self.location(context_vectors)
+        #location softmax on embeddings
+        location, hidden = self.location(embeddings.view(
+                self.batch_size, self.context_size * self.hidden_size))
         l_outputs = F.log_softmax(context_vectors)
         #print(list(l_outputs.size()))
 

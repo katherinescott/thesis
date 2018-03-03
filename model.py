@@ -91,10 +91,15 @@ class CondCopy(nn.Module):
         self.output_shortlist =\
             nn.Linear(self.hidden_size, self.vocab_size)
 
+        #bidirectional RNN layer
         self.location =\
             nn.RNN(
                 self.hidden_size * self.context_size, self.context_size, num_layers=1, batch_first=False, 
-                bidirectional=True) #or context size
+                bidirectional=True)
+
+        #output for location
+        self.output_location =\
+             nn.Linear(self.hidden_size, self.context_size)
 
         self.switch =\
             nn.Linear(self.hidden_size, 1)
@@ -132,7 +137,7 @@ class CondCopy(nn.Module):
         p_loc = torch.mul(location, switch_net.expand_as(location))
         return torch.cat((p_short, p_loc), dim=1)
 
-    def forward(self, context_words):
+    def forward(self, hidden=None, context_words):
         self.batch_size = context_words.size(0)
         assert context_words.size(1) == self.context_size, \
             "context_words.size()=%s | context_size=%d" % \
@@ -159,8 +164,16 @@ class CondCopy(nn.Module):
 
         #location softmax on embeddings
         location, hidden = self.location(embeddings.view(
-                self.batch_size, self.context_size * self.hidden_size))
-        l_outputs = F.log_softmax(context_vectors)
+                self.batch_size, self.context_size * self.hidden_size), hidden)
+        location = F.dropout(location, 0.5, training=False)
+        
+        prev_hidden = hidden[0][-1,:,:] if hidden is not None else Variable(torch.zeros(1, x.size(1), self.hidden_size))
+        prev_hidden = prev_hidden.cuda()
+        
+        location = torch.cat([prev_hidden.view(1, x.size(1), -1), location[:-1,:,:]], dim=0)
+        loc_outputs = self.output_location(location)
+        
+        l_outputs = F.log_softmax(loc_outputs, dim=2)
         #print(list(l_outputs.size()))
 
         #switch network -- probabililty 
@@ -169,4 +182,4 @@ class CondCopy(nn.Module):
         #compute pointer softmax
         output = self.pointer_softmax(s_outputs, l_outputs, switch)
 
-        return output
+        return output, hidden

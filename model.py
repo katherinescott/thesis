@@ -135,7 +135,7 @@ class CondCopy(nn.Module):
         #location = location.expand_as(shortlist)
         p_short = torch.mul(shortlist, (1 - switch_net.expand_as(shortlist)))
         p_loc = torch.mul(location, switch_net.expand_as(location))
-        return torch.cat((p_short, p_loc), dim=0)
+        return torch.cat((p_short, p_loc), dim=2)
 
     def forward(self, context_words, training=False):
         self.batch_size = context_words.size(0)
@@ -165,9 +165,8 @@ class CondCopy(nn.Module):
         #RNN on embeddings
         location, hidden = self.location(embeddings.view(
                 self.batch_size, self.context_size * self.hidden_size))
-        location = F.dropout(location, 0.5, training)
         
-        loc_outputs = self.output_location(location)
+        loc_outputs = self.output_location(location.view((-1, location.size(2))))
         
         l_outputs = F.log_softmax(loc_outputs)
         print(list(l_outputs.size()))

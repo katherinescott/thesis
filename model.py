@@ -163,15 +163,16 @@ class CondCopy(nn.Module):
         print(list(s_outputs.size()))
 
         #RNN on embeddings
-        location, hidden = self.location(embeddings.view(
+        #location, hidden = self.location(embeddings.view(
+                #self.batch_size, self.context_size * self.hidden_size))
+        #print(list(location.size()))
+
+        #loc_outputs = self.output_location(location.view((location.size(0), -1)))
+        #print(list(loc_outputs.size()))
+
+        l_outputs = F.log_softmax(embeddings.view(
                 self.batch_size, self.context_size * self.hidden_size))
-        print(list(location.size()))
-
-        loc_outputs = self.output_location(location.view((location.size(0), -1)))
-        print(list(loc_outputs.size()))
-
-        l_outputs = F.log_softmax(loc_outputs)
-        print(list(l_outputs.size()))
+        #print(list(l_outputs.size()))
 
         #switch network -- probabililty 
         switch = (F.sigmoid(self.switch(context_vectors)))

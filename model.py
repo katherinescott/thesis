@@ -156,12 +156,12 @@ class CondCopy(nn.Module):
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
         #location softmax
-        location_GRU, hidden = self.location(context_vectors)
-        l_outputs = F.log_softmax(location_GRU)
-        print(l_outputs)
+        location, hidden = self.location(context_vectors)
+        l_outputs = F.log_softmax(location)
 
         #switch network -- probabililty 
         switch = F.sigmoid(self.switch(context_vectors))
+        print(switch)
 
         #compute pointer softmax
         output = self.pointer_softmax(s_outputs, l_outputs, switch)

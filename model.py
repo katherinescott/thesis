@@ -94,7 +94,7 @@ class CondCopy(nn.Module):
         #bidirectional RNN layer
         self.location =\
             nn.RNN(
-                self.hidden_size * self.context_size, self.context_size, num_layers=1, batch_first=False, 
+                self.hidden_size * self.context_size, self.hidden_size, num_layers=1, batch_first=False, 
                 bidirectional=True)
 
         #output for location
@@ -166,9 +166,9 @@ class CondCopy(nn.Module):
         location, hidden = self.location(embeddings.view(
                 self.batch_size, self.context_size * self.hidden_size))
         location = F.dropout(location, 0.5, training)
-        #location = location.cuda()
+        location = location.cuda()
         
-        #location = torch.cat([prev_hidden.view(1, self.vocab_size(1), -1), location[:-1,:,:]], dim=0)
+        location = torch.cat([prev_hidden.view(1, self.vocab_size(1), -1), location[:-1,:,:]], dim=0)
         loc_outputs = self.output_location(location)
         
         l_outputs = F.log_softmax(loc_outputs, dim=2)

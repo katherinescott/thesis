@@ -135,7 +135,7 @@ class CondCopy(nn.Module):
         #location = location.expand_as(shortlist)
         p_short = torch.mul(shortlist, (1 - switch_net.expand_as(shortlist)))
         p_loc = torch.mul(location, switch_net.expand_as(location))
-        return #torch.cat((p_short, p_loc), dim=0)
+        return torch.cat((p_short, p_loc), dim=1)
 
     def forward(self, context_words, training=False):
         self.batch_size = context_words.size(0)
@@ -167,7 +167,7 @@ class CondCopy(nn.Module):
                 self.batch_size, self.context_size * self.hidden_size))
         print(list(location.size()))
 
-        loc_outputs = self.output_location(location)#location.view((-1, location.size(2))))
+        loc_outputs = self.output_location(location.view((location.size(0), -1)))
         print(list(loc_outputs.size()))
 
         l_outputs = F.log_softmax(loc_outputs)

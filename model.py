@@ -160,7 +160,8 @@ class CondCopy(nn.Module):
         l_outputs = F.log_softmax(location)
 
         #switch network -- probabililty 
-        switch = np.mean(F.sigmoid(self.switch(context_vectors)))
+        switch = (F.sigmoid(self.switch(context_vectors)))
+        switch = sum(switch)/len(switch)
         print(switch)
 
         #compute pointer softmax

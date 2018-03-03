@@ -181,4 +181,4 @@ class CondCopy(nn.Module):
         #compute pointer softmax
         output = self.pointer_softmax(s_outputs, l_outputs, switch)
 
-        return output, hidden
+        return output

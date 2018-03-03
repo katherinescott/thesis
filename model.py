@@ -160,7 +160,7 @@ class CondCopy(nn.Module):
         assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
         s_outputs = F.log_softmax(shortlist_outputs)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
-        print(list(s_outputs.size()))
+        #print(list(s_outputs.size()))
 
         #RNN on embeddings
         #location, hidden = self.location(embeddings.view(

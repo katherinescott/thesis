@@ -166,7 +166,7 @@ class CondCopy(nn.Module):
         location, hidden = self.location(embeddings.view(
                 self.batch_size, self.context_size * self.hidden_size))
         location = F.dropout(location, 0.5, training)
-        location = location.cuda()
+        #location = location.cuda()
         
         #location = torch.cat([prev_hidden.view(1, self.vocab_size(1), -1), location[:-1,:,:]], dim=0)
         loc_outputs = self.output_location(location)

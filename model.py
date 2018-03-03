@@ -167,7 +167,7 @@ class CondCopy(nn.Module):
                 self.batch_size, self.context_size * self.hidden_size))
         print(list(location.size()))
 
-        loc_outputs = self.output_location(location.view((-1, location.size(2))))
+        loc_outputs = self.output_location(location)#location.view((-1, location.size(2))))
         print(list(loc_outputs.size()))
 
         l_outputs = F.log_softmax(loc_outputs)

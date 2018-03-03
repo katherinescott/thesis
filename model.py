@@ -127,9 +127,10 @@ class CondCopy(nn.Module):
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
     def pointer_softmax(self, shortlist, location, switch_net):
-        p_short = shortlist * switch_net
-        p_loc = location * (1 - switch_net)
-        return torch.cat((p_short, p_loc), dim=0)
+        #location = location.expand_as(shortlist)
+        p_short = torch.mul(shortlist, switch_net.expand_as(shortlist))
+        p_loc = torch.mul(location, (1 - switch_net.expand_as(location)))
+        return torch.cat((p_short, p_loc), dim=1)
 
     def forward(self, context_words):
         self.batch_size = context_words.size(0)
@@ -157,14 +158,12 @@ class CondCopy(nn.Module):
         print(list(s_outputs.size()))
 
         #location softmax
-        location, hidden = self.location(context_vectors)
-        l_outputs = F.log_softmax(location)
+        #location, hidden = self.location(context_vectors)
+        l_outputs = F.log_softmax(context_vectors)
         print(list(l_outputs.size()))
 
         #switch network -- probabililty 
         switch = (F.sigmoid(self.switch(context_vectors)))
-        switch = sum(switch)/len(switch)
-        print(switch)
 
         #compute pointer softmax
         output = self.pointer_softmax(s_outputs, l_outputs, switch)

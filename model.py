@@ -154,10 +154,12 @@ class CondCopy(nn.Module):
         assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
         s_outputs = F.log_softmax(shortlist_outputs)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
+        print(list(s_outputs.size()))
 
         #location softmax
         location, hidden = self.location(context_vectors)
         l_outputs = F.log_softmax(location)
+        print(list(l_outputs.size()))
 
         #switch network -- probabililty 
         switch = (F.sigmoid(self.switch(context_vectors)))

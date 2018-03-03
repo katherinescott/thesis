@@ -62,7 +62,7 @@ def evaluate(model, data_iter, text_field, args):
         target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
         # get model output
-        output = model(context).cuda()
+        output, _ = model(context).cuda()
         # calculate total loss
         loss = loss_function_tot(output, target)  # loss is already averaged
         total_loss += loss.data.cpu().numpy()[0]

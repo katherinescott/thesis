@@ -163,7 +163,8 @@ class CondCopy(nn.Module):
         #print(list(s_outputs.size()))
 
         #RNN on embeddings
-        location, hidden = self.location(embeddings, hidden)
+        location, hidden = self.location(embeddings.view(
+                self.batch_size, self.context_size * self.hidden_size), hidden)
         location = F.dropout(location, 0.5, training)
         location = location.cuda()
         

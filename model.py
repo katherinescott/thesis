@@ -137,7 +137,7 @@ class CondCopy(nn.Module):
         p_loc = torch.mul(location, switch_net.expand_as(location))
         return torch.cat((p_short, p_loc), dim=1)
 
-    def forward(self, hidden=None, context_words):
+    def forward(self, context_words, hidden=None):
         self.batch_size = context_words.size(0)
         assert context_words.size(1) == self.context_size, \
             "context_words.size()=%s | context_size=%d" % \

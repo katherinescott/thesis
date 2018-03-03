@@ -92,7 +92,7 @@ class CondCopy(nn.Module):
             nn.Linear(self.hidden_size, self.vocab_size)
 
         self.location =\
-            nn.GRU(
+            nn.RNN(
                 self.hidden_size, self.context_size, num_layers=1, batch_first=False, 
                 bidirectional=True) #or context size
 

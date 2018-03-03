@@ -167,7 +167,7 @@ class CondCopy(nn.Module):
                 self.batch_size, self.context_size * self.hidden_size))
         location = F.dropout(location, 0.5, training)
         location = location.cuda()
-        (seq len, batch, hidden*numdirections)
+        #(seq len, batch, hidden*numdirections)
 
         prev_hidden = hidden[0][-1,:] if hidden is not None else Variable(torch.zeros(2, self.batch_size, self.hidden_size))
         prev_hidden = prev_hidden.cuda()

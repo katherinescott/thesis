@@ -91,8 +91,10 @@ class CondCopy(nn.Module):
         self.output_shortlist =\
             nn.Linear(self.hidden_size, self.vocab_size)
 
-        self.output_location =\
-            nn.Linear(self.hidden_size, self.context_size) #or context size
+        self.location =\
+            nn.GRU(
+                self.hidden_size, self.context_size, num_layers=1, batch_first=False, 
+                bidirectional=True) #or context size
 
         self.switch =\
             nn.Linear(self.hidden_size, 1)
@@ -154,8 +156,8 @@ class CondCopy(nn.Module):
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
         #location softmax
-        location_outputs = self.output_location(context_vectors)
-        l_outputs = F.log_softmax(location_outputs)
+        location_GRU, hidden = self.location(context_vectors)
+        l_outputs = F.log_softmax(location_GRU)
         print(l_outputs)
 
         #switch network -- probabililty 

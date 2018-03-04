@@ -173,9 +173,9 @@ class CondCopy(nn.Module):
 
         l_tan = F.tanh(self.output_location(context_vectors)) #hid if i need to use the RNN
 
-        b = []
+        #b = []
 
-        b.append(torch.sum(context_vectors * l_tan, 1))
+        #b.append(torch.sum(context_vectors * l_tan, 1))
 
         #for s in range(self.batch_size):
 
@@ -183,7 +183,7 @@ class CondCopy(nn.Module):
 
         #b = torch.stack(b)
 
-        l_outputs = F.log_softmax(b)
+        l_outputs = F.log_softmax(context_vectors * l_tan)
 
         assert l_outputs.size() == (self.batch_size, self.hidden_size)
 

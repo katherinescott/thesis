@@ -95,7 +95,7 @@ class CondCopy(nn.Module):
         self.output_location =\
              nn.Linear(self.hidden_size, self.hidden_size)
 
-        self.rnn = nn.LSTMCell(hidden_size, hidden_size)
+        self.rnn = nn.LSTMCell(self.hidden_size, self.hidden_size)
 
         self.switch =\
             nn.Linear(self.hidden_size, 1)

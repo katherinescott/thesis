@@ -129,8 +129,8 @@ class CondCopy(nn.Module):
 
     def pointer_softmax(self, shortlist, location, switch_net):
         #location = location.expand_as(shortlist)
-        p_short = torch.mm(shortlist, (1 - switch_net.expand_as(shortlist)))
-        p_loc = torch.mm(location, switch_net.expand_as(location))
+        p_short = torch.mul(shortlist, (1-switch_net))
+        p_loc = torch.mul(location, switch_net)
         return #torch.cat((p_short, p_loc), dim=1)
 
     def forward(self, context_words):

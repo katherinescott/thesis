@@ -91,15 +91,11 @@ class CondCopy(nn.Module):
         self.output_shortlist =\
             nn.Linear(self.hidden_size, self.vocab_size)
 
-        #bidirectional RNN layer
-        #self.location =\
-            #nn.RNN(
-                #self.hidden_size * self.context_size, self.hidden_size, num_layers=1, batch_first=False, 
-                #bidirectional=True)
-
         #output for location
         self.output_location =\
-             nn.Linear(self.hidden_size, self.context_size)
+             nn.Linear(self.hidden_size, self.hidden_size)
+
+        self.rnn = nn.LSTMCell(hidden_size, hidden_size)
 
         self.switch =\
             nn.Linear(self.hidden_size, 1)
@@ -133,21 +129,30 @@ class CondCopy(nn.Module):
 
     def pointer_softmax(self, shortlist, location, switch_net):
         #location = location.expand_as(shortlist)
-        p_short = torch.mul(shortlist, (1 - switch_net.expand_as(shortlist)))
-        p_loc = torch.mul(location, switch_net.expand_as(location))
-        return torch.cat((p_short, p_loc), dim=1)
+        p_short = torch.mm(shortlist, (1 - switch_net.expand_as(shortlist)))
+        p_loc = torch.mm(location, switch_net.expand_as(location))
+        return #torch.cat((p_short, p_loc), dim=1)
 
-    def forward(self, context_words, training=False):
+    def forward(self, context_words):
         self.batch_size = context_words.size(0)
         assert context_words.size(1) == self.context_size, \
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
+
+        probs = []
+        hids = []
+
+        hid = Variable(torch.FloatTensor(self.batch_size, self.hidden_size).fill_(0))
+        c = Variable(torch.FloatTensor(self.batch_size, self.hidden_size).fill_(0))
+
+        pointers = []
 
         #embedding layer
         embeddings = self.embedding_layer(context_words)
         # sanity check
         assert embeddings.size() == \
             (self.batch_size, self.context_size, self.hidden_size)
+
         
         #get context vectors
         context_vectors = self.context_layer(embeddings.view(
@@ -160,23 +165,27 @@ class CondCopy(nn.Module):
         assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
         s_outputs = F.log_softmax(shortlist_outputs)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
-        #print(list(s_outputs.size()))
+        
+        #location softmax
+        #RNN
+        #hid, c = self.rnn(context_vectors, (hid, c))
+        #hids.append(hid)
 
-        #RNN on embeddings
-        #location, hidden = self.location(embeddings.view(
-                #self.batch_size, self.context_size * self.hidden_size))
-        #print(list(location.size()))
+        l_tan = F.tanh(self.output_location(context_vectors)) #hid if i need to use the RNN
 
-        #loc_outputs = self.output_location(location.view((location.size(0), -1)))
-        #print(list(loc_outputs.size()))
+        b = []
 
-        l_outputs = F.log_softmax(embeddings.view(
-                self.batch_size, self.context_size * self.hidden_size))
-        #print(list(l_outputs.size()))
+        for i in range(range(self.batch_size)+1):
+            b.append(torch.sum(context_vectors[i] * l_tan, 1).view(-1))
+
+        b = torch.stack(b)
+
+        l_outputs = F.log_softmax(b.transpose(0,1)).transpose(0,1)
+
+        print(list(l_outputs.size())) 
 
         #switch network -- probabililty 
         switch = (F.sigmoid(self.switch(context_vectors)))
-        switch = sum(switch)/len(switch)
 
         #compute pointer softmax
         output = self.pointer_softmax(s_outputs, l_outputs, switch)

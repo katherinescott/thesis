@@ -184,6 +184,7 @@ class CondCopy(nn.Module):
         b = torch.stack(b)
 
         l_outputs = F.log_softmax(b.transpose(0,1)).transpose(0,1)
+        l_outputs = l_outputs.transpose(0,1)
 
         assert l_outputs.size() == (self.batch_size, self.hidden_size)
 

@@ -175,16 +175,15 @@ class CondCopy(nn.Module):
 
         b = []
 
-        b.append(torch.sum(context_vectors * l_tan, 1).view(-1))
+        b.append(torch.sum(context_vectors * l_tan, 1))
 
         #for s in range(self.batch_size):
 
             #for i in range(s+1):
 
-        b = torch.stack(b)
+        #b = torch.stack(b)
 
-        l_outputs = F.log_softmax(b.transpose(0,1)).transpose(0,1)
-        l_outputs = l_outputs.transpose(0,1)
+        l_outputs = F.log_softmax(b)
 
         assert l_outputs.size() == (self.batch_size, self.hidden_size)
 

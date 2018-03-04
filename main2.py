@@ -40,6 +40,7 @@ def train(model, optimizer, data_iter, text_field, args):
         optimizer.step()
         # enforce the max_norm constraint
         #model.max_norm_embedding()
+        nn.utils.clip_grad_norm(model.parameters(), 1)
         # skip the last batch
         if batch_idx >= iter_len - 2:
             break
@@ -62,7 +63,7 @@ def evaluate(model, data_iter, text_field, args):
         target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
         # get model output
-        output, _ = model(context).cuda()
+        output = model(context).cuda()
         # calculate total loss
         loss = loss_function_tot(output, target)  # loss is already averaged
         total_loss += loss.data.cpu().numpy()[0]

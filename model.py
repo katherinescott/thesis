@@ -130,10 +130,8 @@ class CondCopy(nn.Module):
     def pointer_softmax(self, shortlist, location, switch_net):
         #location = location.expand_as(shortlist)
         p_short = torch.mul(shortlist, (1-switch_net))
-        print(p_short.size())
         p_loc = torch.mul(location, switch_net)
-        print(p_loc.size())
-        return torch.cat((p_short, p_loc), dim=1)
+        return #torch.cat((p_short, p_loc), dim=1)
 
     def forward(self, context_words):
         self.batch_size = context_words.size(0)
@@ -167,7 +165,7 @@ class CondCopy(nn.Module):
         assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
         s_outputs = F.log_softmax(shortlist_outputs)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
-        
+
         #location softmax
         #RNN
         #hid, c = self.rnn(context_vectors, (hid, c))
@@ -187,7 +185,7 @@ class CondCopy(nn.Module):
 
         l_outputs = F.log_softmax(b.transpose(0,1)).transpose(0,1)
 
-        #print(list(l_outputs.size())) 
+        print(list(l_outputs.size())) 
 
         #switch network -- probabililty 
         switch = (F.sigmoid(self.switch(context_vectors)))

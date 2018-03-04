@@ -185,7 +185,7 @@ class CondCopy(nn.Module):
 
         l_outputs = F.log_softmax(b.transpose(0,1)).transpose(0,1)
 
-        print(list(l_outputs.size())) 
+        assert l_outputs.size() == (self.batch_size, self.hidden_size)
 
         #switch network -- probabililty 
         switch = (F.sigmoid(self.switch(context_vectors)))

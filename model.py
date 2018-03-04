@@ -92,10 +92,10 @@ class CondCopy(nn.Module):
             nn.Linear(self.hidden_size, self.vocab_size)
 
         #bidirectional RNN layer
-        self.location =\
-            nn.RNN(
-                self.hidden_size * self.context_size, self.hidden_size, num_layers=1, batch_first=False, 
-                bidirectional=True)
+        #self.location =\
+            #nn.RNN(
+                #self.hidden_size * self.context_size, self.hidden_size, num_layers=1, batch_first=False, 
+                #bidirectional=True)
 
         #output for location
         self.output_location =\

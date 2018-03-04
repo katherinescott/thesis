@@ -131,7 +131,7 @@ class CondCopy(nn.Module):
         #location = location.expand_as(shortlist)
         p_short = torch.mul(shortlist, (1-switch_net))
         p_loc = torch.mul(location, switch_net)
-        return #torch.cat((p_short, p_loc), dim=1)
+        return torch.cat((p_short, p_loc), dim=1)
 
     def forward(self, context_words):
         self.batch_size = context_words.size(0)

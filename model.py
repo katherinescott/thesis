@@ -169,7 +169,7 @@ class CondCopy(nn.Module):
 
         l_outputs = F.log_softmax(location_outputs)
 
-        assert l_outputs.size() == (self.batch_size, self.hidden_size)
+        assert l_outputs.size() == (self.batch_size, self.context_size)
 
         #6) Now you need to somehow combine the two distributions you formed in steps (3) and (5). I guess the easiest approach is to have another 
     #distribution that tells you whether you copied or not. Then, p(word5 | ctx) = p(copied) * pointer_probability_of_word5 + (1 - p(copied)) * probability_of_word5_from_step3.  

@@ -95,8 +95,7 @@ class CondCopy(nn.Module):
         self.output_location =\
              nn.Linear(self.hidden_size, self.hidden_size)
 
-        self.rnn = nn.LSTMCell(self.hidden_size, self.hidden_size)
-
+        #switch probability
         self.switch =\
             nn.Linear(self.hidden_size, 1)
 
@@ -108,24 +107,6 @@ class CondCopy(nn.Module):
             if param.requires_grad:
                 params.append(param)
         return params
-    
-    #dropout: During training, randomly zeroes some of the elements of the input tensor with probability p using samples from a bernoulli distribution. The elements to zero are randomized on every forward call.
-    #torch.norm(input tensor, p=2, dim) p = exponent val in norm formulation, dim = dimension to reduce
-    #make sure weights never exceeds a certain threshold 
-    def max_norm_embedding(self, max_norm=1):
-        #embeds_weight = torch.squeeze(self.embedding_layer.weight)
-        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
-        #norms = torch.unsqueeze(norms, 0) #or squeeze?
-        norms = norms.expand(1, -1)
-        #print(norms.size())
-        #filter out vals where norm > max norm
-        to_rescale = Variable(torch.from_numpy(
-                np.where(norms.data.cpu().numpy() > max_norm)[0]))
-        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data
-        scaled = self.embedding_layer(to_rescale).div(
-                Variable(norms.view(len(to_rescale), 1).expand_as(
-                        self.embedding_layer(to_rescale)))).data
-        self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
     def pointer_softmax(self, shortlist, location, switch_net):
         #location = location.expand_as(shortlist)
@@ -138,14 +119,6 @@ class CondCopy(nn.Module):
         assert context_words.size(1) == self.context_size, \
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
-
-        probs = []
-        hids = []
-
-        hid = Variable(torch.FloatTensor(self.batch_size, self.hidden_size).fill_(0))
-        c = Variable(torch.FloatTensor(self.batch_size, self.hidden_size).fill_(0))
-
-        pointers = []
 
         #embedding layer
         embeddings = self.embedding_layer(context_words)
@@ -167,31 +140,46 @@ class CondCopy(nn.Module):
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
         #location softmax
-        #RNN
-        #hid, c = self.rnn(context_vectors, (hid, c))
-        #hids.append(hid)
 
-        l_tan = F.tanh(self.output_location(context_vectors)) #hid if i need to use the RNN
+        l_tan = F.tanh(self.output_location(context_vectors))
 
-        #b = []
+        assert l_tan.size() == (self.batch_size, self.hidden_size)
 
-        #b.append(torch.sum(context_vectors * l_tan, 1))
+        #(5) Multiply the output of step (4) by the matrix formed from the 4 context word embeddings (you will likely want to use batch matrix multiply (bmm) 
+            #to accomplish this), to get scores that are batch_size x 4. Then apply a softmax to get a distribution over these preceding words.
+        l_cvecs = l_tan[:,None,:]
 
-        #for s in range(self.batch_size):
+        fillers = torch.zeros(self.batch_size, (self.context_size-1), self.hidden_size)
 
-            #for i in range(s+1):
+        l_cvecs = torch.cat((l_cvecs, fillers), dim=1)
 
-        #b = torch.stack(b)
+        assert l_cvecs.size() == (self.batch_size, self.context_size, self.hidden_size)
 
-        l_outputs = F.log_softmax(context_vectors * l_tan)
+        location_outputs = torch.bmm(embeddings, l_cvecs.view(self.batch_size, self.hidden_size, self.context_size))
+
+        assert location_outputs.size() == (self.batch_size, self.context_size, self.context_size)
+
+        temp = []
+        for i in range(0, self.context_size):
+            temp.append(location_outputs[:,:,i])
+
+        location_outputs = sum(temp)
+
+        assert location_outputs.size() == (self.batch_size, self.context_size)
+
+        l_outputs = F.log_softmax(location_outputs)
 
         assert l_outputs.size() == (self.batch_size, self.hidden_size)
+
+        #6) Now you need to somehow combine the two distributions you formed in steps (3) and (5). I guess the easiest approach is to have another 
+    #distribution that tells you whether you copied or not. Then, p(word5 | ctx) = p(copied) * pointer_probability_of_word5 + (1 - p(copied)) * probability_of_word5_from_step3.  
+    #Note that pointer_probability_of_word5 might be zero. 
 
         #switch network -- probabililty 
         switch = (F.sigmoid(self.switch(context_vectors)))
         switch = sum(switch)/len(switch)
 
         #compute pointer softmax
-        output = self.pointer_softmax(s_outputs, l_outputs, switch)
+        output = switch*l_outputs + (1-switch)*s_outputs
 
         return output

@@ -30,7 +30,9 @@ def train(model, optimizer, data_iter, text_field, args):
         # zero out gradients
         optimizer.zero_grad()
         # get output
-        shortlist, pointer = model(context).cuda()
+        shortlist, pointer = model(context)
+        shortlist = shortlist.cuda()
+        pointer = pointer.cuda()
         # calculate loss
         pdb.set_trace()
         loss = loss_function_avg(shortlist, target)
@@ -66,7 +68,9 @@ def evaluate(model, data_iter, text_field, args):
         target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
         # get model output
-        output = model(context).cuda()
+        shortlist, pointer = model(context)
+        shortlist = shortlist.cuda()
+        pointer = pointer.cuda()
         # calculate total loss
         loss = loss_function_tot(output[0], target)  # loss is already averaged
         loss += loss_function_tot(output[1], target)

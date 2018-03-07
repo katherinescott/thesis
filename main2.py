@@ -40,7 +40,6 @@ def train(model, optimizer, data_iter, text_field, args):
         optimizer.step()
         # enforce the max_norm constraint
         #model.max_norm_embedding()
-        nn.utils.clip_grad_norm(model.parameters(), 1)
         # skip the last batch
         if batch_idx >= iter_len - 2:
             break

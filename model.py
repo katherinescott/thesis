@@ -195,6 +195,6 @@ class CondCopy(nn.Module):
         switch = sum(switch)/len(switch)
 
         #compute pointer softmax
-        output = torch.cat((switch*l_outputs,  (1-switch)*s_outputs), dim=1)
+        output = (switch*l_outputs),  ((1-switch)*s_outputs)
 
         return output

@@ -167,7 +167,7 @@ class CondCopy(nn.Module):
 
 
 
-        l_cvecs = torch.cat([l_cvecs, fillers], dim=1)
+        l_cvecs = torch.cat(Variable(l_cvecs), Variable(fillers), dim=1)
 
         assert l_cvecs.size() == (self.batch_size, self.context_size, self.hidden_size)
 

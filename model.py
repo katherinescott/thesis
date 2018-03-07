@@ -168,7 +168,7 @@ class CondCopy(nn.Module):
 
         assert l_cvecs.size() == (self.batch_size, self.context_size, self.hidden_size)
 
-        location_outputs = torch.bmm(embeddings, l_cvecs.view(self.batch_size, self.hidden_size, self.context_size))
+        location_outputs = torch.bmm(embeddings, l_cvecs.view(self.batch_size, self.hidden_size, self.context_size).contiguous())
 
         assert location_outputs.size() == (self.batch_size, self.context_size, self.context_size)
 

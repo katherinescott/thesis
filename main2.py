@@ -119,7 +119,7 @@ def main():
     
     location_dim = (model.hidden_size, model.hidden_size)
     model.output_location.weight.data = \
-        Tensor.(np.random.normal(size=location_dim))
+        Tensor(np.random.normal(size=location_dim))
 
     # Specify optimizer
     if args.optimizer == "Adamax":

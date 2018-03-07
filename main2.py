@@ -11,6 +11,7 @@ from config import args
 from model import LBL, CondCopy
 from torch import Tensor
 import torch.cuda
+import pdb
 
 
 def train(model, optimizer, data_iter, text_field, args):
@@ -29,10 +30,13 @@ def train(model, optimizer, data_iter, text_field, args):
         # zero out gradients
         optimizer.zero_grad()
         # get output
-        output = model(context).cuda()
+        pointer, shortlist = model(context).cuda()
         # calculate loss
-        loss = loss_function_avg(output, target)
-        total_loss += loss_function_tot(output, target).data.cpu().numpy()[0]
+        pdb.set_trace()
+        loss = loss_function_avg(shortlist, target)
+        loss += loss_function_avg(pointer, target)
+        total_loss += loss_function_tot(shortlist, target).data.cpu().numpy()[0]
+        total_loss += loss_function_tot(pointer, target).data.cpu().numpy()[0]
         data_size += batch_size
         # calculate gradients
         loss.backward()
@@ -62,9 +66,10 @@ def evaluate(model, data_iter, text_field, args):
         target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
         # get model output
-        output = model(context).cuda()
+        pointer, shortlist = model(context).cuda()
         # calculate total loss
-        loss = loss_function_tot(output, target)  # loss is already averaged
+        loss = loss_function_tot(shortlist, target)  # loss is already averaged
+        loss += loss_function_tot(pointer, target)
         total_loss += loss.data.cpu().numpy()[0]
         data_size += batch_size
 

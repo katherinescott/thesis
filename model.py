@@ -195,6 +195,6 @@ class CondCopy(nn.Module):
         switch = sum(switch)/len(switch)
 
         #compute pointer softmax
-        output = ((switch*l_outputs),  ((1-switch)*s_outputs))
+        #output = ((switch*l_outputs),  ((1-switch)*s_outputs))
 
-        return output
+        return (switch*l_outputs),  ((1-switch)*s_outputs)

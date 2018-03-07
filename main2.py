@@ -116,6 +116,7 @@ def main():
         raise ValueError('{} is not a valid embedding weight \
                           initializer'.format(args.init_weights))
     model.output_shortlist.weight.data = model.embedding_layer.weight.data
+    model.output_location.weight.data = model.embedding_layer.weight.data
 
     # Specify optimizer
     if args.optimizer == "Adamax":

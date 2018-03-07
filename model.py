@@ -160,11 +160,11 @@ class CondCopy(nn.Module):
             #to accomplish this), to get scores that are batch_size x 4. Then apply a softmax to get a distribution over these preceding words.
 
         l_cvecs = l_tan[:,None,:]
-        l_cvecs = l_cvecs.expand_as(embeddings)
+        #l_cvecs = l_cvecs.expand_as(embeddings)
 
-        #fillers = torch.zeros(self.batch_size, (self.context_size-1), self.hidden_size).cuda()
+        fillers = torch.zeros(self.batch_size, (self.context_size-1), self.hidden_size).cuda()
 
-        #l_cvecs = torch.cat([l_cvecs, fillers], dim=1)
+        l_cvecs = torch.cat([l_cvecs, fillers], dim=1)
 
         assert l_cvecs.size() == (self.batch_size, self.context_size, self.hidden_size)
 

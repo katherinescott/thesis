@@ -161,13 +161,13 @@ class CondCopy(nn.Module):
         
         #OR l_cvecs = l_tan.expand_as(embeddings)
 
-        l_cvecs = l_tan[:,None,:]
+        l_cvecs = l_tan[:,None,:].cuda()
 
-        fillers = torch.zeros(self.batch_size, (self.context_size-1), self.hidden_size)
+        fillers = torch.zeros(self.batch_size, (self.context_size-1), self.hidden_size).cuda()
 
 
 
-        l_cvecs = torch.cat(Variable(l_cvecs), Variable(fillers), dim=1)
+        l_cvecs = torch.cat([l_cvecs, fillers], dim=1)
 
         assert l_cvecs.size() == (self.batch_size, self.context_size, self.hidden_size)
 

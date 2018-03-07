@@ -147,7 +147,7 @@ class CondCopy(nn.Module):
         #shortlist softmax
         shortlist_outputs = self.output_shortlist(context_vectors)
         assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
-        s_outputs = F.log_softmax(shortlist_outputs)
+        s_outputs = F.log_softmax(shortlist_outputs, dim=1)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
         #location softmax
@@ -182,7 +182,7 @@ class CondCopy(nn.Module):
 
         assert location_outputs.size() == (self.batch_size, self.context_size)
 
-        l_outputs = F.log_softmax(location_outputs)
+        l_outputs = F.log_softmax(location_outputs, dim=1)
 
         assert l_outputs.size() == (self.batch_size, self.context_size)
 

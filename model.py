@@ -152,7 +152,7 @@ class CondCopy(nn.Module):
 
         #location softmax
 
-        l_tan = F.tanh(self.output_location(context_vectors))
+        l_tan = F.tanh(F.linear(context_vectors))
 
         assert l_tan.size() == (self.batch_size, self.hidden_size)
 

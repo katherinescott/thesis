@@ -159,15 +159,13 @@ class CondCopy(nn.Module):
         #(5) Multiply the output of step (4) by the matrix formed from the 4 context word embeddings (you will likely want to use batch matrix multiply (bmm) 
             #to accomplish this), to get scores that are batch_size x 4. Then apply a softmax to get a distribution over these preceding words.
         
-        #OR l_cvecs = l_tan.expand_as(embeddings)
+        l_cvecs = l_tan.expand_as(embeddings)
 
-        l_cvecs = l_tan[:,None,:].cuda()
+        #l_cvecs = l_tan[:,None,:].cuda()
 
-        fillers = torch.zeros(self.batch_size, (self.context_size-1), self.hidden_size).cuda()
+        #fillers = torch.zeros(self.batch_size, (self.context_size-1), self.hidden_size).cuda()
 
-
-
-        l_cvecs = torch.cat([l_cvecs, fillers], dim=1)
+        #l_cvecs = torch.cat([l_cvecs, fillers], dim=1)
 
         assert l_cvecs.size() == (self.batch_size, self.context_size, self.hidden_size)
 

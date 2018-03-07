@@ -36,12 +36,13 @@ def train(model, optimizer, data_iter, text_field, args):
         # calculate loss
         #pdb.set_trace()
         loss = loss_function_avg(shortlist, target)
-        loss += loss_function_avg(pointer, target)
+        loss2 = loss_function_avg(pointer, target)
         total_loss += loss_function_tot(shortlist, target).data.cpu().numpy()[0]
         total_loss += loss_function_tot(pointer, target).data.cpu().numpy()[0]
         data_size += batch_size
         # calculate gradients
         loss.backward()
+        loss2.backward()
         # update parameters
         optimizer.step()
         # enforce the max_norm constraint

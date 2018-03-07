@@ -121,6 +121,10 @@ def main():
     model.output_location.weight.data = \
         Tensor(np.random.normal(size=location_dim))
 
+    switch_dim = (1, model.hidden_size)
+    model.switch.weight.data = \
+        Tensor(np.random.normal(size=switch_dim))
+
     # Specify optimizer
     if args.optimizer == "Adamax":
         print("Optimizer: Adamax")

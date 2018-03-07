@@ -64,7 +64,7 @@ class LBL(nn.Module):
         assert context_vectors.size() == (self.batch_size, self.hidden_size)
         raw_outputs = self.output_layer(context_vectors)
         assert raw_outputs.size() == (self.batch_size, self.vocab_size)
-        outputs = F.log_softmax(raw_outputs)
+        outputs = F.log_softmax(raw_outputs, dim=1)
         assert outputs.size() == (self.batch_size, self.vocab_size)
         return outputs
 
@@ -156,7 +156,7 @@ class CondCopy(nn.Module):
 
         assert l_tan.size() == (self.batch_size, self.hidden_size)
 
-        l_cvecs = torch.mul(context_vectors, l_tan)
+        l_cvecs = l_tan #torch.mul(context_vectors, l_tan)
 
         #(5) Multiply the output of step (4) by the matrix formed from the 4 context word embeddings (you will likely want to use batch matrix multiply (bmm) 
             #to accomplish this), to get scores that are batch_size x 4. Then apply a softmax to get a distribution over these preceding words.

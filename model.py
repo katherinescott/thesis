@@ -85,7 +85,7 @@ class CondCopy(nn.Module):
         self.max_norm_embedding()
         # C in the paper // nn.Linear (in features, out features) *doesn't learn additive bias
         self.context_layer = nn.Linear(
-                self.hidden_size * self.context_size,
+                self.hidden_size * self.context_size/10,
                 self.hidden_size, bias=False)
         # dot product + bias in the paper
         self.output_shortlist =\
@@ -135,12 +135,12 @@ class CondCopy(nn.Module):
         embeddings = self.embedding_layer(context_words)
         # sanity check
         assert embeddings.size() == \
-            (self.batch_size, self.context_size, self.hidden_size)
+            (self.batch_size, self.context_size/10, self.hidden_size)
 
         
         #get context vectors
         context_vectors = self.context_layer(embeddings.view(
-                self.batch_size, self.context_size * self.hidden_size))
+                self.batch_size, self.context_size/10 * self.hidden_size))
         context_vectors = self.dropout(context_vectors)
         assert context_vectors.size() == (self.batch_size, self.hidden_size)
         
@@ -172,7 +172,7 @@ class CondCopy(nn.Module):
 
         location_outputs = torch.bmm(embeddings, l_cvecs.view(self.batch_size, self.hidden_size, 1).contiguous())
 
-        assert location_outputs.size() == (self.batch_size, self.context_size, 1)
+        assert location_outputs.size() == (self.batch_size, self.context_size/10, 1)
 
         #temp = []
         #for i in range(0, self.context_size):
@@ -180,11 +180,11 @@ class CondCopy(nn.Module):
 
         location_outputs = torch.squeeze(location_outputs)
 
-        assert location_outputs.size() == (self.batch_size, self.context_size)
+        assert location_outputs.size() == (self.batch_size, self.context_size/10)
 
         l_outputs = F.log_softmax(location_outputs, dim=1)
 
-        assert l_outputs.size() == (self.batch_size, self.context_size)
+        assert l_outputs.size() == (self.batch_size, self.context_size/10)
 
         #6) Now you need to somehow combine the two distributions you formed in steps (3) and (5). I guess the easiest approach is to have another 
     #distribution that tells you whether you copied or not. Then, p(word5 | ctx) = p(copied) * pointer_probability_of_word5 + (1 - p(copied)) * probability_of_word5_from_step3.  

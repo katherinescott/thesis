@@ -85,7 +85,7 @@ class CondCopy(nn.Module):
         self.max_norm_embedding()
         # C in the paper // nn.Linear (in features, out features) *doesn't learn additive bias
         self.context_layer = nn.Linear(
-                self.hidden_size * (self.context_size/10.),
+                self.hidden_size * self.context_size/10.,
                 self.hidden_size, bias=False)
         # dot product + bias in the paper
         self.output_shortlist =\

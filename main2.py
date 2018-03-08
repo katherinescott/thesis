@@ -33,7 +33,7 @@ def train(model, optimizer, data_iter, text_field, args):
 
         #pointer_vocab = text_field.build_vocab(batch.text, vectors=torchtext.vocab.GloVe(name='6B', dim=100))
 
-        words_before = context[:-5, :]#.cuda()
+        words_before = context[:, :-5]#.cuda()
 
         # zero out gradients
         optimizer.zero_grad()

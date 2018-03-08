@@ -97,7 +97,7 @@ class CondCopy(nn.Module):
 
         #switch probability
         self.switch =\
-            nn.Linear(self.hidden_size, 2)
+            nn.Linear(self.hidden_size, 1)
 
         self.dropout = nn.Dropout(p=dropout)
 

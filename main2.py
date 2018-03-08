@@ -50,7 +50,7 @@ def train(model, optimizer, data_iter, text_field, args):
         #then index into 
         indices = []
         for i in range(1, words_before.size(1)):
-            if words_before[:,i] == target:
+            if (words_before[:,i] == target).numpy():
                 indices.append(i)
 
         for i in range(len(indices)):

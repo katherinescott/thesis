@@ -86,6 +86,7 @@ def train(model, optimizer, data_iter, text_field, args):
             break
 
         batch_idx += 1
+    print(data_size)
 
     avg_loss = total_loss / data_size
     return model, optimizer, np.exp(avg_loss)

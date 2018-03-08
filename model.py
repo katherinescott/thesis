@@ -85,7 +85,7 @@ class CondCopy(nn.Module):
         self.max_norm_embedding()
         # C in the paper // nn.Linear (in features, out features) *doesn't learn additive bias
         self.context_layer = nn.Linear(
-                self.hidden_size * self.context_size,
+                self.hidden_size * int(self.context_size/10),
                 self.hidden_size, bias=False)
         # dot product + bias in the paper
         self.output_shortlist =\
@@ -135,12 +135,12 @@ class CondCopy(nn.Module):
         embeddings = self.embedding_layer(context_words)
         # sanity check
         assert embeddings.size() == \
-            (self.batch_size, self.context_size/10, self.hidden_size)
+            (self.batch_size, int(self.context_size/10), self.hidden_size)
 
         
         #get context vectors
         context_vectors = self.context_layer(embeddings.view(
-                self.batch_size, self.context_size/10 * self.hidden_size))
+                self.batch_size, int(self.context_size/10) * self.hidden_size))
         context_vectors = self.dropout(context_vectors)
         assert context_vectors.size() == (self.batch_size, self.hidden_size)
         

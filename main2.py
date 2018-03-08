@@ -44,7 +44,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # calculate loss
         #pdb.set_trace()
         loss = loss_function_avg(shortlist, target)
-        total_loss += loss_function_tot(shortlist, target).data.cpu().numpy()[0]
+        total_loss += loss_function_tot(shortlist, target).data[0]
 
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 

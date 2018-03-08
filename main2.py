@@ -26,7 +26,7 @@ def train(model, optimizer, data_iter, text_field, args):
     iter_len = len(data_iter)
     batch_idx = 0
     for batch in data_iter:
-        context = torch.transpose(batch.text[:, -5:], 0, 1)
+        context = torch.transpose(batch.text[:,-5:], 0, 1)
         target = (batch.target[-1, :]).cuda()
 
         batch_size = context.size(0)
@@ -54,14 +54,24 @@ def train(model, optimizer, data_iter, text_field, args):
                 indices.append(i)
 
         for i in range(len(indices)):
-            loss += loss_function_avg(pointer, words_before[:,indices[i]])
-            total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
-        
+            if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
+                loss += loss_function_avg(pointer, words_before[:,indices[i]])
+                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
+                for j in range(i):
+                    if j == i: 
+                        continue
+                    else:
+                        loss -= loss_function_avg(pointer, words_before[:,indices[j]])
+                        total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
+                continue
+            else:
+                loss += loss_function_avg(pointer, words_before[:,indices[i]])
+                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
+            
 
         data_size += batch_size
         # calculate gradients
         loss.backward()
-        loss2.backward()
         # update parameters
         optimizer.step()
         # enforce the max_norm constraint
@@ -149,9 +159,9 @@ def main():
     model.output_location.weight.data = \
         Tensor(np.random.normal(size=location_dim))
 
-    #switch_dim = (1, model.hidden_size)
-    #model.switch.weight.data = \
-        #Tensor(np.random.normal(size=switch_dim))
+    switch_dim = (1, model.hidden_size)
+    model.switch.weight.data = \
+        Tensor(np.random.normal(size=switch_dim))
 
     # Specify optimizer
     if args.optimizer == "Adamax":

@@ -27,20 +27,20 @@ def train(model, optimizer, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        target = (batch.target[-1, :]).cuda()
+        target = (batch.target[-1, :])#.cuda()
 
         batch_size = context.size(0)
 
         #pointer_vocab = text_field.build_vocab(batch.text, vectors=torchtext.vocab.GloVe(name='6B', dim=100))
 
-        words_before = context[:-5, :].cuda()
+        words_before = context[:-5, :]#.cuda()
 
         # zero out gradients
         optimizer.zero_grad()
         # get output
         shortlist, pointer = model(context[:, -5:])
-        shortlist = shortlist.cuda()
-        pointer = pointer.cuda()
+        shortlist = shortlist#.cuda()
+        pointer = pointer#.cuda()
         # calculate loss
         #pdb.set_trace()
         loss = loss_function_avg(shortlist, target)
@@ -56,17 +56,17 @@ def train(model, optimizer, data_iter, text_field, args):
         for i in range(len(indices)):
             if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
                 loss += loss_function_avg(pointer, words_before[:,indices[i]])
-                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
+                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data[0] #.cpu().numpy()
                 for j in range(i):
                     if j == i: 
                         continue
                     else:
                         loss -= loss_function_avg(pointer, words_before[:,indices[j]])
-                        total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
+                        total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).[0]
                 continue
             else:
                 loss += loss_function_avg(pointer, words_before[:,indices[i]])
-                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
+                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.[0]
             
 
         data_size += batch_size

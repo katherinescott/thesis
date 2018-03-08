@@ -62,11 +62,11 @@ def train(model, optimizer, data_iter, text_field, args):
                         continue
                     else:
                         loss -= loss_function_avg(pointer, words_before[:,indices[j]])
-                        total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).[0]
+                        total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data[0]
                 continue
             else:
                 loss += loss_function_avg(pointer, words_before[:,indices[i]])
-                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.[0]
+                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data[0]
             
 
         data_size += batch_size

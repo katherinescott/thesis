@@ -50,8 +50,8 @@ def train(model, optimizer, data_iter, text_field, args):
         #then index into 
         indices = []
         for i in range(1, words_before.size(1)):
-            if words_before[:,i] == target
-            indices.append(i)
+            if words_before[:,i] == target:
+                indices.append(i)
 
         for i in range(len(indices)):
             loss += loss_function_avg(pointer, words_before[:,indices[i]])

@@ -50,7 +50,7 @@ def train(model, optimizer, data_iter, text_field, args):
         #then index into 
         indices = []
         for i in range(1, words_before.size(1)):
-            if torch.all(torch.eq(words_before[:,i], target)).numpy():
+            if torch.all(torch.eq(words_before[:,i], target)):
                 indices.append(i)
 
         for i in range(len(indices)):

@@ -38,7 +38,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # zero out gradients
         optimizer.zero_grad()
         # get output
-        shortlist, pointer = model(context[:, -5:])
+        pointer, shortlist = model(context[:, -5:])
         shortlist = shortlist#.cuda()
         pointer = pointer#.cuda()
         # calculate loss
@@ -98,7 +98,7 @@ def evaluate(model, data_iter, text_field, args):
         target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
         # get model output
-        shortlist, pointer = model(context)
+        pointer, shortlist = model(context)
         shortlist = shortlist.cuda()
         pointer = pointer.cuda()
         # calculate total loss

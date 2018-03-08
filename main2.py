@@ -28,6 +28,7 @@ def train(model, optimizer, data_iter, text_field, args):
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :])#.cuda()
+        print(target)
 
         batch_size = context.size(0)
 
@@ -43,6 +44,7 @@ def train(model, optimizer, data_iter, text_field, args):
         pointer = pointer#.cuda()
         # calculate loss
         #pdb.set_trace()
+        print(shortlist)
         loss = loss_function_avg(shortlist, target)
         total_loss += loss_function_tot(shortlist, target).data[0]
 

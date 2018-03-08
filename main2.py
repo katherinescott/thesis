@@ -70,6 +70,7 @@ def train(model, optimizer, data_iter, text_field, args):
             else:
                 loss += loss_function_avg(pointer, words_before[:,indices[i]])
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data[0]
+                print(loss, total_loss)
             
 
         data_size += batch_size

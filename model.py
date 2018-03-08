@@ -75,7 +75,7 @@ class CondCopy(nn.Module):
     def __init__(self, pretrained_embeds, context_size, dropout=0.):
         super(CondCopy, self).__init__()
         # n in the paper
-        self.context_size = context_size
+        self.context_size = context_size/10
         self.hidden_size = pretrained_embeds.size(1)
         self.vocab_size = pretrained_embeds.size(0)
         
@@ -85,7 +85,7 @@ class CondCopy(nn.Module):
         self.max_norm_embedding()
         # C in the paper // nn.Linear (in features, out features) *doesn't learn additive bias
         self.context_layer = nn.Linear(
-                self.hidden_size * (self.context_size/10),
+                self.hidden_size * (self.context_size),
                 self.hidden_size, bias=False)
         # dot product + bias in the paper
         self.output_shortlist =\

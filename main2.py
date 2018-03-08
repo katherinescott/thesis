@@ -53,10 +53,13 @@ def train(model, optimizer, data_iter, text_field, args):
             if torch.equal(words_before[:,i], target):
                 indices.append(i)
 
+        print(indices)
         for i in range(len(indices)):
             if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
                 loss += loss_function_avg(pointer, words_before[:,indices[i]])
+                print(loss)
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data[0] #.cpu().numpy()
+                print(total_loss)
                 for j in range(i):
                     if j == i: 
                         continue

@@ -185,7 +185,7 @@ class CondCopy(nn.Module):
 
         l_outputs = F.log_softmax(location_outputs, dim=1)
 
-        print(l_outputs)
+        print(l_outputs[0,:])
 
         assert l_outputs.size() == (self.batch_size, self.context_size/10)
 

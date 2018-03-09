@@ -148,7 +148,7 @@ class CondCopy(nn.Module):
         #shortlist softmax
         shortlist_outputs = self.output_shortlist(context_vectors)
         assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
-        s_outputs = F.log_softmax(shortlist_outputs)
+        s_outputs = F.softmax(shortlist_outputs)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
         #location softmax
@@ -185,9 +185,6 @@ class CondCopy(nn.Module):
 
         l_outputs = F.softmax(location_outputs, dim=1)
 
-        print(l_outputs[0,:])
-        print(l_outputs)
-
         assert l_outputs.size() == (self.batch_size, self.context_size)
 
         #6) Now you need to somehow combine the two distributions you formed in steps (3) and (5). I guess the easiest approach is to have another 
@@ -201,4 +198,4 @@ class CondCopy(nn.Module):
         #compute pointer softmax
         #output = ((switch*l_outputs),  ((1-switch)*s_outputs))
 
-        return (switch*l_outputs),  ((1-switch)*s_outputs)
+        return torch.log(switch*l_outputs),  torch.log((1-switch)*s_outputs)

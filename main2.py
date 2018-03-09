@@ -27,24 +27,24 @@ def train(model, optimizer, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        target = (batch.target[-1, :])#.cuda()
+        target = (batch.target[-1, :]).cuda()
 
         batch_size = context.size(0)
 
         #pointer_vocab = text_field.build_vocab(batch.text, vectors=torchtext.vocab.GloVe(name='6B', dim=100))
 
-        words_before = context[:, :-5]#.cuda()
+        words_before = context[:, :-5].cuda()
 
         # zero out gradients
         optimizer.zero_grad()
         # get output
         pointer, shortlist = model(context)
-        shortlist = shortlist#.cuda()
-        pointer = pointer#.cuda()
+        shortlist = shortlist.cuda()
+        pointer = pointer.cuda()
         # calculate loss
         #pdb.set_trace()
         loss = loss_function_avg(shortlist, target)
-        total_loss += loss_function_tot(shortlist, target).data[0]
+        total_loss += loss_function_tot(shortlist, target).data.cpu().numpy()[0]
 
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
@@ -58,18 +58,18 @@ def train(model, optimizer, data_iter, text_field, args):
             if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
                 loss += loss_function_avg(pointer, words_before[:,indices[i]])
                 #print(loss)
-                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data[0] #.cpu().numpy()
+                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
                 #print(total_loss)
                 for j in range(i):
                     if j == i: 
                         continue
                     else:
                         loss -= loss_function_avg(pointer, words_before[:,indices[j]])
-                        total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data[0]
+                        total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
                 continue
             else:
                 loss += loss_function_avg(pointer, words_before[:,indices[i]])
-                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data[0]
+                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
                 print(loss, total_loss)
 
         data_size += batch_size
@@ -98,15 +98,15 @@ def evaluate(model, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        target = (batch.target[-1, :])#.cuda()
+        target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
 
-        words_before = context[:, :-5]
+        words_before = context[:, :-5].cuda()
 
         # get model output
         pointer, shortlist = model(context)
-        shortlist = shortlist#.cuda()
-        pointer = pointer#.cuda()
+        shortlist = shortlist.cuda()
+        pointer = pointer.cuda()
 
 
         # calculate total loss
@@ -129,7 +129,7 @@ def evaluate(model, data_iter, text_field, args):
             else:
                 loss += loss_function_tot(pointer, words_before[:,indices[i]])
 
-        total_loss += loss.data[0] #.cpu().numpy()[0]
+        total_loss += loss.data.cpu().numpy()[0]
 
 
         data_size += batch_size

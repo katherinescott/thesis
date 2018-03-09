@@ -100,14 +100,38 @@ def evaluate(model, data_iter, text_field, args):
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
+
+        words_before = context[:, :-5]
+
         # get model output
         pointer, shortlist = model(context)
-        shortlist = shortlist.cuda()
-        pointer = pointer.cuda()
+        shortlist = shortlist#.cuda()
+        pointer = pointer#.cuda()
+
+
         # calculate total loss
-        loss = loss_function_tot(output[0], target)  # loss is already averaged
-        loss += loss_function_tot(output[1], target)
-        total_loss += loss.data.cpu().numpy()[0]
+        loss = loss_function_tot(shortlist, target)  # loss is already averaged
+        
+        indices = []
+        for i in range(1, words_before.size(1)):
+            if torch.equal(words_before[:,i], target):
+                indices.append(i)
+
+        for i in range(len(indices)):
+            if loss_function_tot(pointer, words_before[:,indices[i]]) == 0:
+                loss += loss_function_tot(pointer, words_before[:,indices[i]])
+                for j in range(i):
+                    if j == i: 
+                        continue
+                    else:
+                        loss -= loss_function_tot(pointer, words_before[:,indices[j]])
+                continue
+            else:
+                loss += loss_function_tot(pointer, words_before[:,indices[i]])
+
+        total_loss += loss.data[0] #.cpu().numpy()[0]
+
+
         data_size += batch_size
 
         # skip last batch

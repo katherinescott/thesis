@@ -38,7 +38,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # zero out gradients
         optimizer.zero_grad()
         # get output
-        pointer, shortlist = model(context[:, -5:])
+        pointer, shortlist = model(context)
         shortlist = shortlist#.cuda()
         pointer = pointer#.cuda()
         # calculate loss
@@ -80,11 +80,10 @@ def train(model, optimizer, data_iter, text_field, args):
         # enforce the max_norm constraint
         #model.max_norm_embedding()
         # skip the last batch
-        if batch_idx >= iter_len - 2:
+        if batch_idx==0 #>= iter_len - 2:
             break
 
         batch_idx += 1
-    print(data_size)
 
     avg_loss = total_loss / data_size
     return model, optimizer, np.exp(avg_loss)

@@ -193,9 +193,6 @@ class CondCopy(nn.Module):
     #distribution that tells you whether you copied or not. Then, p(word5 | ctx) = p(copied) * pointer_probability_of_word5 + (1 - p(copied)) * probability_of_word5_from_step3.  
     #Note that pointer_probability_of_word5 might be zero. 
 
-        total_out = F.log_softmax(torch.cat(l_outputs, shortlist_outputs, 1), dim=1)
-        total_out = total_out[]
-
         #switch network -- probabililty 
         switch = (F.sigmoid(self.switch(context_vectors)))
         switch = sum(switch)/len(switch)

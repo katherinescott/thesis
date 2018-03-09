@@ -49,29 +49,29 @@ def train(model, optimizer, data_iter, text_field, args):
 
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
-        #indices = []
-        #for i in range(1, words_before.size(1)):
-            #if torch.equal(words_before[:,i], target):
-                #indices.append(i)
+        indices = []
+        for i in range(1, words_before.size(1)):
+            if torch.equal(words_before[:,i], target):
+                indices.append(i)
 
         #print(indices)
-        #for i in range(len(indices)):
-            #if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
-                #loss += loss_function_avg(pointer, words_before[:,indices[i]])
+        for i in range(len(indices)):
+            if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
+                loss += loss_function_avg(pointer, words_before[:,indices[i]])
                 #print(loss)
-                #total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data[0] #.cpu().numpy()
+                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data[0] #.cpu().numpy()
                 #print(total_loss)
-                #for j in range(i):
-                    #if j == i: 
-                        #continue
-                    #else:
-                        #loss -= loss_function_avg(pointer, words_before[:,indices[j]])
-                        #total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data[0]
-                #continue
-            #else:
-                #loss += loss_function_avg(pointer, words_before[:,indices[i]])
-                #total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data[0]
-                #print(loss, total_loss)
+                for j in range(i):
+                    if j == i: 
+                        continue
+                    else:
+                        loss -= loss_function_avg(pointer, words_before[:,indices[j]])
+                        total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data[0]
+                continue
+            else:
+                loss += loss_function_avg(pointer, words_before[:,indices[i]])
+                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data[0]
+                print(loss, total_loss)
             
 
         data_size += batch_size

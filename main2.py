@@ -33,7 +33,7 @@ def train(model, optimizer, data_iter, text_field, args):
 
         #pointer_vocab = text_field.build_vocab(batch.text, vectors=torchtext.vocab.GloVe(name='6B', dim=100))
 
-        words_before = context[:, :-5].cuda()
+        words_before = context.cuda() #[:, :-5]
 
         # zero out gradients
         optimizer.zero_grad()
@@ -101,7 +101,7 @@ def evaluate(model, data_iter, text_field, args):
         target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
 
-        words_before = context[:, :-5].cuda()
+        words_before = context.cuda() #[:, :-5]
 
         # get model output
         pointer, shortlist = model(context)

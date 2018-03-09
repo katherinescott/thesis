@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser()
 # required arguments
 parser.add_argument("--context_size",
                     help="number of words taken into account in context",
-                    type=int, default=50)
+                    type=int, default=5)
 parser.add_argument("--epochs", help="number of epochs",
                     type=int, default=20)
 parser.add_argument("--batch_size", help="batching size",

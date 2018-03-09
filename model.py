@@ -78,6 +78,7 @@ class CondCopy(nn.Module):
         self.context_size = context_size
         self.hidden_size = pretrained_embeds.size(1)
         self.vocab_size = pretrained_embeds.size(0)
+        self.vocab = pretrained_embeds
         
         #nn.Embedding(num embeddings, embedding dim)
         self.embedding_layer = nn.Embedding(
@@ -97,7 +98,7 @@ class CondCopy(nn.Module):
 
         #switch probability
         self.switch =\
-            nn.Linear(self.hidden_size, 2)
+            nn.Linear(self.hidden_size, 1)
 
         self.dropout = nn.Dropout(p=dropout)
 
@@ -184,11 +185,16 @@ class CondCopy(nn.Module):
 
         l_outputs = F.log_softmax(location_outputs)
 
+        print(l_outputs)
+
         assert l_outputs.size() == (self.batch_size, self.context_size/10)
 
         #6) Now you need to somehow combine the two distributions you formed in steps (3) and (5). I guess the easiest approach is to have another 
     #distribution that tells you whether you copied or not. Then, p(word5 | ctx) = p(copied) * pointer_probability_of_word5 + (1 - p(copied)) * probability_of_word5_from_step3.  
     #Note that pointer_probability_of_word5 might be zero. 
+
+        total_out = F.log_softmax(torch.cat(l_outputs, shortlist_outputs, 1), dim=1)
+        total_out = total_out[]
 
         #switch network -- probabililty 
         switch = (F.sigmoid(self.switch(context_vectors)))

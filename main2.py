@@ -98,7 +98,7 @@ def evaluate(model, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        target = (batch.target[-1, :]).cuda()
+        target = (batch.target[-1, :])#.cuda()
         batch_size = context.size(0)
 
         words_before = context[:, :-5]

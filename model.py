@@ -64,7 +64,7 @@ class LBL(nn.Module):
         assert context_vectors.size() == (self.batch_size, self.hidden_size)
         raw_outputs = self.output_layer(context_vectors)
         assert raw_outputs.size() == (self.batch_size, self.vocab_size)
-        outputs = F.log_softmax(raw_outputs, dim=1)
+        outputs = F.log_softmax(raw_outputs)
         assert outputs.size() == (self.batch_size, self.vocab_size)
         return outputs
 
@@ -147,7 +147,7 @@ class CondCopy(nn.Module):
         #shortlist softmax
         shortlist_outputs = self.output_shortlist(context_vectors)
         assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
-        s_outputs = F.log_softmax(shortlist_outputs, dim=1)
+        s_outputs = F.log_softmax(shortlist_outputs)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
         #location softmax
@@ -182,7 +182,7 @@ class CondCopy(nn.Module):
 
         assert location_outputs.size() == (self.batch_size, self.context_size/10)
 
-        l_outputs = F.log_softmax(location_outputs, dim=1)
+        l_outputs = F.log_softmax(location_outputs)
 
         assert l_outputs.size() == (self.batch_size, self.context_size/10)
 

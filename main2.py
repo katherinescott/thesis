@@ -293,7 +293,7 @@ def main():
             'start_epoch': epoch + 1,
             'args': args,
             'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict()
+            'optimizer_state_dict': optimizer.state_dict(),
             'model2_state_dict': model2.state_dict(),
             'optimizer2_state_dict': optimizer2.state_dict()
         }, checkpoint_name)

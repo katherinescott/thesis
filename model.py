@@ -78,18 +78,9 @@ class CopyProb(nn.Module):
         self.vocab_size = pretrained_embeds.size(0)
         self.vocab = pretrained_embeds
 
-        self.embedding_layer = nn.Embedding(
-                self.vocab_size, self.hidden_size, max_norm=1, norm_type=2)
-        self.max_norm_embedding()
-        # C in the paper // nn.Linear (in features, out features) *doesn't learn additive bias
-        self.context_layer = nn.Linear(
-                self.hidden_size * int(self.context_size/10),
-                self.hidden_size, bias=False)
-
         self.switch =\
             nn.Linear(self.hidden_size, 1)
 
-        self.dropout = nn.Dropout(p=dropout)
 
     def get_train_parameters(self):
         params = []
@@ -98,35 +89,8 @@ class CopyProb(nn.Module):
                 params.append(param)
         return params
 
-    def max_norm_embedding(self, max_norm=1):
-        norms = torch.norm(self.embedding_layer.weight, p=2, dim=1)
-        #filter out vals where norm > max norm
-        to_rescale = Variable(torch.from_numpy(
-                np.where(norms.data.cpu().numpy() > max_norm)[0]))
-        norms = torch.norm(self.embedding_layer(to_rescale), p=2, dim=1).data
-        scaled = self.embedding_layer(to_rescale).div(
-                Variable(norms.view(len(to_rescale), 1).expand_as(
-                        self.embedding_layer(to_rescale)))).data
-        self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
-    def forward(self, context_words):
-        self.batch_size = context_words.size(0)
-        assert context_words.size(1) == int(self.context_size/10), \
-            "context_words.size()=%s | context_size=%d" % \
-            (context_words.size(), self.context_size)
-
-        #embedding layer
-        embeddings = self.embedding_layer(context_words)
-        # sanity check
-        assert embeddings.size() == \
-            (self.batch_size, int(self.context_size/10), self.hidden_size)
-        
-        #get context vectors
-        context_vectors = self.context_layer(embeddings.view(
-                self.batch_size, int(self.context_size/10) * self.hidden_size))
-        context_vectors = self.dropout(context_vectors)
-        assert context_vectors.size() == (self.batch_size, self.hidden_size)
-
+    def forward(self, context_vectors):
         switch = (F.sigmoid(self.switch(context_vectors)))
         switch = sum(switch)/len(switch)
 

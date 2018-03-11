@@ -127,7 +127,7 @@ def evaluate(model, data_iter, text_field, args):
                         continue
                     else:
                         loss -= loss_function_tot(pointer, words_before[:,indices[j]])
-                #loss -= loss_function_tot(shortlist, target)
+                loss -= loss_function_tot(shortlist, target)
                 continue
             else:
                 loss += loss_function_tot(pointer, words_before[:,indices[i]])

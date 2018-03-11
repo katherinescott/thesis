@@ -53,18 +53,18 @@ def train(model, optimizer, optimizer2, data_iter, text_field, args):
         loss2 = loss_function_avg(shortlist, target)
         
         indices = []
-        for i in range(words_before.size(1)):
+        for i in range(0,words_before.size(1)):
             if torch.equal(words_before[:,i], target):
                 indices.append(i)
 
         if len(indices) == 0:
-            for i in range(words_before.size(1)):
+            for i in range(0,words_before.size(1)):
                 loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
             loss2 -= loss_function_avg(shortlist, target)
 
         else:
-            for i in range(len(indices)):
+            for i in range(0,len(indices)):
                 if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
                     loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
                     #print(loss)
@@ -127,16 +127,16 @@ def evaluate(model, data_iter, text_field, args):
         loss = loss_function_tot(shortlist, target)  # loss is already averaged
 
         indices = []
-        for i in range(1, words_before.size(1)):
+        for i in range(0, words_before.size(1)):
             if torch.equal(words_before[:,i], target):
                 indices.append(i)
 
         if len(indices) == 0:
-            for i in range(words_before.size(1)):
+            for i in range(0,words_before.size(1)):
                 loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
 
         else:
-            for i in range(len(indices)):
+            for i in range(0,len(indices)):
                 if loss_function_tot(pointer, words_before[:,indices[i]]) == 0:
                     loss += loss_function_tot(pointer, words_before[:,indices[i]])
                     for j in range(i):

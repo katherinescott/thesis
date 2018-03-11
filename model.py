@@ -89,6 +89,8 @@ class CopyProb(nn.Module):
         self.switch =\
             nn.Linear(self.hidden_size, 1)
 
+        self.dropout = nn.Dropout(p=dropout)
+
     def get_train_parameters(self):
         params = []
         for param in self.parameters():

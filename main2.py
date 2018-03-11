@@ -39,7 +39,7 @@ def train(model, optimizer, optimizer2, data_iter, text_field, args):
         optimizer.zero_grad()
         optimizer2.zero_grad()
         # get output
-        pointer, shortlist = model(context)
+        pointer, shortlist = model(context[:,-5:])
         shortlist = shortlist.cuda()
         pointer = pointer.cuda()
         # calculate loss
@@ -50,31 +50,37 @@ def train(model, optimizer, optimizer2, data_iter, text_field, args):
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
         
-        loss2=0
+        loss2 = loss_function_avg(pointer, words_before[:,0])
         
         indices = []
-        for i in range(1, words_before.size(1)):
+        for i in range(words_before.size(1)):
             if torch.equal(words_before[:,i], target):
                 indices.append(i)
 
-        #print(indices)
-        for i in range(len(indices)):
-            if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
-                loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
-                #print(loss)
-                total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
-                #print(total_loss)
-                for j in range(i):
-                    if j == i: 
-                        continue
-                    else:
-                        loss2 -= loss_function_avg(pointer, words_before[:,indices[j]])
-                        total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
-                total_loss -= loss_function_tot(shortlist, target).data.cpu().numpy()[0]
-                continue
-            else:
+        if len(indices == 0):
+            for i in range(words_before.size(1)):
                 loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
+
+        else:
+            for i in range(len(indices)):
+                if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
+                    loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
+                    #print(loss)
+                    total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
+                    #print(total_loss)
+                    for j in range(i):
+                        if j == i: 
+                            continue
+                        else:
+                            loss2 -= loss_function_avg(pointer, words_before[:,indices[j]])
+                            total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
+                    total_loss -= loss_function_tot(shortlist, target).data.cpu().numpy()[0]
+                    continue
+                else:
+                    loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
+                    total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
+
 
         data_size += batch_size
         # calculate gradients
@@ -110,7 +116,7 @@ def evaluate(model, data_iter, text_field, args):
         words_before = context.cuda() #[:, :-5]
 
         # get model output
-        pointer, shortlist = model(context)
+        pointer, shortlist = model(context[:,-5:])
         shortlist = shortlist.cuda()
         pointer = pointer.cuda()
 
@@ -123,18 +129,24 @@ def evaluate(model, data_iter, text_field, args):
             if torch.equal(words_before[:,i], target):
                 indices.append(i)
 
-        for i in range(len(indices)):
-            if loss_function_tot(pointer, words_before[:,indices[i]]) == 0:
-                loss += loss_function_tot(pointer, words_before[:,indices[i]])
-                for j in range(i):
-                    if j == i: 
-                        continue
-                    else:
-                        loss -= loss_function_tot(pointer, words_before[:,indices[j]])
-                loss -= loss_function_tot(shortlist, target)
-                continue
-            else:
-                loss += loss_function_tot(pointer, words_before[:,indices[i]])
+        if len(indices == 0):
+            for i in range(words_before.size(1)):
+                loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
+
+        else:
+            for i in range(len(indices)):
+                if loss_function_tot(pointer, words_before[:,indices[i]]) == 0:
+                    loss += loss_function_tot(pointer, words_before[:,indices[i]])
+                    for j in range(i):
+                        if j == i: 
+                            continue
+                        else:
+                            loss -= loss_function_tot(pointer, words_before[:,indices[j]])
+                    loss -= loss_function_tot(shortlist, target)
+                    continue
+                else:
+                    loss += loss_function_tot(pointer, words_before[:,indices[i]])
+
 
         total_loss += loss.data.cpu().numpy()[0]
 

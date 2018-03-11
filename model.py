@@ -73,7 +73,7 @@ class LBL(nn.Module):
 class CopyProb(nn.Module):
     def __init__(self, pretrained_embeds, context_size, dropout=0.):
         super(CopyProb, self).__init__()
-        self.context_size = context_size
+        self.context_size = int(context_size/10)
         self.hidden_size = pretrained_embeds.size(1)
         self.vocab_size = pretrained_embeds.size(0)
         self.vocab = pretrained_embeds
@@ -99,7 +99,7 @@ class CondCopy(nn.Module):
     def __init__(self, pretrained_embeds, context_size, dropout=0.):
         super(CondCopy, self).__init__()
         # n in the paper
-        self.context_size = context_size
+        self.context_size = int(context_size/10)
         self.hidden_size = pretrained_embeds.size(1)
         self.vocab_size = pretrained_embeds.size(0)
         self.vocab = pretrained_embeds

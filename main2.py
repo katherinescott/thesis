@@ -66,8 +66,8 @@ def train(model, optimizer, data_iter, text_field, args):
                     else:
                         loss -= loss_function_avg(pointer, words_before[:,indices[j]])
                         total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
-                loss -= loss_function_avg(shortlist, target)
-                total_loss -= loss_function_tot(shortlist, target).data.cpu().numpy()[0]
+                #loss -= loss_function_avg(shortlist, target)
+                #total_loss -= loss_function_tot(shortlist, target).data.cpu().numpy()[0]
                 continue
             else:
                 loss += loss_function_avg(pointer, words_before[:,indices[i]])
@@ -127,7 +127,7 @@ def evaluate(model, data_iter, text_field, args):
                         continue
                     else:
                         loss -= loss_function_tot(pointer, words_before[:,indices[j]])
-                loss -= loss_function_tot(shortlist, target)
+                #loss -= loss_function_tot(shortlist, target)
                 continue
             else:
                 loss += loss_function_tot(pointer, words_before[:,indices[i]])
@@ -150,8 +150,8 @@ def evaluate(model, data_iter, text_field, args):
 
 def main():
     train_iter, val_iter, test_iter, text_field = utils.load_ptb(
-        ptb_path='data3.zip',
-        ptb_dir='data3',
+        ptb_path='data.zip',
+        ptb_dir='data',
         bptt_len=args.context_size,
         batch_size=args.batch_size,
         gpu=args.GPU,
@@ -185,9 +185,9 @@ def main():
                           initializer'.format(args.init_weights))
     model.output_shortlist.weight.data = model.embedding_layer.weight.data
     
-    #location_dim = (model.hidden_size, model.hidden_size)
-    #model.output_location.weight.data = \
-        #Tensor(np.random.normal(size=location_dim))
+    location_dim = (model.hidden_size, model.hidden_size)
+    model.output_location.weight.data = \
+        Tensor(np.random.normal(size=location_dim))
 
     switch_dim = (1, model.hidden_size)
     model.switch.weight.data = \

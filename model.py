@@ -120,7 +120,6 @@ class CopyProb(nn.Module):
         # sanity check
         assert embeddings.size() == \
             (self.batch_size, int(self.context_size/10), self.hidden_size)
-
         
         #get context vectors
         context_vectors = self.context_layer(embeddings.view(

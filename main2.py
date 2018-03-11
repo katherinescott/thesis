@@ -100,7 +100,7 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
         batch_idx += 1
 
     avg_loss = total_loss / data_size
-    return model, optimizer, np.exp(avg_loss)
+    return model, model2, optimizer, optimizer2, np.exp(avg_loss)
 
 
 def evaluate(model, model2, data_iter, text_field, args):
@@ -255,7 +255,7 @@ def main():
     print("Model: %s" % model)
     val_perps = []
     for epoch in range(args.start_epoch, args.epochs):
-        model, optimizer, optimizer2, train_perp = train(model, model2, optimizer, optimizer2, train_iter,
+        model, model2, optimizer, optimizer2, train_perp = train(model, model2, optimizer, optimizer2, train_iter,
                                              text_field, args)
         print("TRAIN [EPOCH %d]: PERPLEXITY %.5lf" % (epoch, train_perp))
         val_perp = evaluate(model, model2, val_iter, text_field, args)

@@ -78,6 +78,14 @@ class CopyProb(nn.Module):
         self.vocab_size = pretrained_embeds.size(0)
         self.vocab = pretrained_embeds
 
+        self.embedding_layer = nn.Embedding(
+                self.vocab_size, self.hidden_size, max_norm=1, norm_type=2)
+        self.max_norm_embedding()
+        # C in the paper // nn.Linear (in features, out features) *doesn't learn additive bias
+        self.context_layer = nn.Linear(
+                self.hidden_size * int(self.context_size/10),
+                self.hidden_size, bias=False)
+
         self.switch =\
             nn.Linear(self.hidden_size, 1)
 
@@ -88,7 +96,25 @@ class CopyProb(nn.Module):
                 params.append(param)
         return params
 
-    def forward(self, context_vectors):
+    def forward(self, context_words):
+        self.batch_size = context_words.size(0)
+        assert context_words.size(1) == int(self.context_size/10), \
+            "context_words.size()=%s | context_size=%d" % \
+            (context_words.size(), self.context_size)
+
+        #embedding layer
+        embeddings = self.embedding_layer(context_words)
+        # sanity check
+        assert embeddings.size() == \
+            (self.batch_size, int(self.context_size/10), self.hidden_size)
+
+        
+        #get context vectors
+        context_vectors = self.context_layer(embeddings.view(
+                self.batch_size, int(self.context_size/10) * self.hidden_size))
+        context_vectors = self.dropout(context_vectors)
+        assert context_vectors.size() == (self.batch_size, self.hidden_size)
+        
         switch = (F.sigmoid(self.switch(context_vectors)))
         switch = sum(switch)/len(switch)
 
@@ -216,7 +242,7 @@ class CondCopy(nn.Module):
     #Note that pointer_probability_of_word5 might be zero. 
 
         #switch network -- probabililty 
-        switch = self.copy(context_vectors)
+        switch = self.copy(context_words)
 
         #compute pointer softmax
         #output = ((switch*l_outputs),  ((1-switch)*s_outputs))

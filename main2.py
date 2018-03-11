@@ -56,7 +56,8 @@ def train(model, optimizer, data_iter, text_field, args):
         #print(indices)
         for i in range(len(indices)):
             if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
-                loss += loss_function_avg(pointer, words_before[:,indices[i]])
+                loss2 = loss_function_avg(pointer, words_before[:,indices[i]])
+                loss += loss2
                 #print(loss)
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
                 #print(total_loss)
@@ -64,21 +65,24 @@ def train(model, optimizer, data_iter, text_field, args):
                     if j == i: 
                         continue
                     else:
-                        loss -= loss_function_avg(pointer, words_before[:,indices[j]])
+                        loss -= loss2
                         total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
                 #loss -= loss_function_avg(shortlist, target)
                 total_loss -= loss_function_tot(shortlist, target).data.cpu().numpy()[0]
                 continue
             else:
-                loss += loss_function_avg(pointer, words_before[:,indices[i]])
+                loss2 = loss_function_avg(pointer, words_before[:,indices[i]])
+                loss+=loss2
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
                 print(loss, total_loss)
 
         data_size += batch_size
         # calculate gradients
         loss.backward()
+        loss2.backward()
         # update parameters
         optimizer.step()
+        optimizer2.step()
         # enforce the max_norm constraint
         #model.max_norm_embedding()
         # skip the last batch
@@ -203,6 +207,9 @@ def main():
     elif args.optimizer == "Adam":
         print("Optimizer: Adam")
         optimizer = optim.Adam(model.get_train_parameters(),
+                               lr=lr, weight_decay=args.l2)
+
+        optimizer2 = optim.Adam(model2.get_train_parameters(),
                                lr=lr, weight_decay=args.l2)
     elif args.optimizer == "SGD":
         print("Optimizer: SGD")

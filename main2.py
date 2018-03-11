@@ -39,7 +39,7 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
         optimizer.zero_grad()
         optimizer2.zero_grad()
         # get output
-        pointer, shortlist = model(context[:,-5:])
+        pointer, shortlist, copy = model(context[:,-5:])
         shortlist = shortlist #.cuda()
         pointer = pointer #.cuda()
         # calculate loss
@@ -58,6 +58,7 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
                 indices.append(i)
 
         if len(indices) == 0:
+            loss2 += 1 - copy
             for i in range(0, len(indices)):
                 loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
@@ -167,8 +168,8 @@ def evaluate(model, model2, data_iter, text_field, args):
 
 def main():
     train_iter, val_iter, test_iter, text_field = utils.load_ptb(
-        ptb_path='data3.zip',
-        ptb_dir='data3',
+        ptb_path='data.zip',
+        ptb_dir='data',
         bptt_len=args.context_size,
         batch_size=args.batch_size,
         gpu=args.GPU,

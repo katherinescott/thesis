@@ -218,7 +218,7 @@ class CondCopy(nn.Module):
     #Note that pointer_probability_of_word5 might be zero. 
 
         #switch network -- probabililty 
-        switch = self.copy(context_words)
+        switch = self.copy(context_vectors)
 
         #compute pointer softmax
         #output = ((switch*l_outputs),  ((1-switch)*s_outputs))

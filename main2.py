@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.optim as optim
 import utils
 from config import args
-from model import LBL, CondCopy
+from model import LBL, CondCopy, CopyProb
 from torch import Tensor
 import torch.cuda
 import pdb

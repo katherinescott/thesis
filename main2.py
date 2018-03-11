@@ -39,7 +39,8 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
         optimizer.zero_grad()
         optimizer2.zero_grad()
         # get output
-        pointer, shortlist, copy = model(context[:,-5:])
+        pointer, shortlist = model(context[:,-5:])
+        switch = model2(context[:,-5:])
         shortlist = shortlist #.cuda()
         pointer = pointer #.cuda()
         # calculate loss
@@ -58,16 +59,17 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
                 indices.append(i)
 
         if len(indices) == 0:
-            loss2 += 1 - copy
+            loss2 += copy
             for i in range(0, len(indices)):
-                loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
+                loss += loss_function_avg(pointer, words_before[:,indices[i]])
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
             loss2 -= loss_function_avg(shortlist, target)
 
         else:
+            loss2 += 1 - copy
             for i in range(0,len(indices)):
                 if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
-                    loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
+                    loss += loss_function_avg(pointer, words_before[:,indices[i]])
                     #print(loss)
                     total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
                     #print(total_loss)
@@ -75,19 +77,19 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
                         if j == i: 
                             continue
                         else:
-                            loss2 -= loss_function_avg(pointer, words_before[:,indices[j]])
+                            loss -= loss_function_avg(pointer, words_before[:,indices[j]])
                             total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
                     total_loss -= loss_function_tot(shortlist, target).data.cpu().numpy()[0]
                     continue
                 else:
-                    loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
+                    loss += loss_function_avg(pointer, words_before[:,indices[i]])
                     total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
             loss2 -= loss_function_avg(shortlist, target)
 
 
         data_size += batch_size
         # calculate gradients
-        loss.backward(retain_graph=True)
+        loss.backward()
         loss2.backward()
         # update parameters
         optimizer.step()

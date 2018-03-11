@@ -221,4 +221,4 @@ class CondCopy(nn.Module):
         #compute pointer softmax
         #output = ((switch*l_outputs),  ((1-switch)*s_outputs))
 
-        return torch.log(switch*l_outputs),  torch.log((1-switch)*s_outputs), switch
+        return torch.log(switch*l_outputs),  torch.log((1-switch)*s_outputs)

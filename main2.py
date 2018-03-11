@@ -119,7 +119,7 @@ def evaluate(model, model2, data_iter, text_field, args):
         words_before = context[:,:-5].cuda() #[:, :-5]
 
         # get model output
-        pointer, shortlist = model(context[:,-5:])
+        pointer, shortlist, copy = model(context[:,-5:])
         shortlist = shortlist.cuda()
         pointer = pointer.cuda()
 

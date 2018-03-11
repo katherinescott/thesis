@@ -50,7 +50,7 @@ def train(model, optimizer, optimizer2, data_iter, text_field, args):
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
         
-        loss2 = loss_function_avg(pointer, words_before[:,0])
+        loss2 = loss_function_avg(shortlist, target)
         
         indices = []
         for i in range(words_before.size(1)):
@@ -61,6 +61,7 @@ def train(model, optimizer, optimizer2, data_iter, text_field, args):
             for i in range(words_before.size(1)):
                 loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
+            loss2 -= loss_function_avg(shortlist, target)
 
         else:
             for i in range(len(indices)):
@@ -80,6 +81,7 @@ def train(model, optimizer, optimizer2, data_iter, text_field, args):
                 else:
                     loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
                     total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
+            loss2 -= loss_function_avg(shortlist, target)
 
 
         data_size += batch_size

@@ -33,7 +33,7 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
 
         #pointer_vocab = text_field.build_vocab(batch.text, vectors=torchtext.vocab.GloVe(name='6B', dim=100))
 
-        words_before = context #.cuda() #[:, :-5]
+        words_before = context[:,:-5] #.cuda() #[:, :-5]
 
         # zero out gradients
         optimizer.zero_grad()
@@ -115,7 +115,7 @@ def evaluate(model, model2, data_iter, text_field, args):
         target = (batch.target[-1, :])#.cuda()
         batch_size = context.size(0)
 
-        words_before = context #.cuda() #[:, :-5]
+        words_before = context[:,:-5] #.cuda() #[:, :-5]
 
         # get model output
         pointer, shortlist = model(context[:,-5:])
@@ -168,8 +168,8 @@ def evaluate(model, model2, data_iter, text_field, args):
 
 def main():
     train_iter, val_iter, test_iter, text_field = utils.load_ptb(
-        ptb_path='data.zip',
-        ptb_dir='data',
+        ptb_path='data3.zip',
+        ptb_dir='data3',
         bptt_len=args.context_size,
         batch_size=args.batch_size,
         gpu=args.GPU,

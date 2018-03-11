@@ -58,7 +58,7 @@ def train(model, optimizer, optimizer2, data_iter, text_field, args):
                 indices.append(i)
 
         if len(indices) == 0:
-            for i in range(0, indices):
+            for i in range(0, len(indices)):
                 loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
             loss2 -= loss_function_avg(shortlist, target)
@@ -132,7 +132,7 @@ def evaluate(model, data_iter, text_field, args):
                 indices.append(i)
 
         if len(indices) == 0:
-            for i in range(0,indices):
+            for i in range(0, len(indices)):
                 loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
 
         else:

@@ -274,9 +274,12 @@ def main():
             for param_group in optimizer.param_groups:
                 param_group['lr'] = lr
 
+            for param_group in optimizer2.param_groups:
+                param_group['lr'] = lr
+
             # test model every 5 epochs
         if epoch % 5 == 0:
-            test_perp = evaluate(model, test_iter, text_field, args)
+            test_perp = evaluate(model, model2, test_iter, text_field, args)
             print("TEST [EPOCH %d]: PERPLEXITY %.5lf" % (epoch, test_perp))
 
         # saving model
@@ -291,10 +294,12 @@ def main():
             'args': args,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict()
+            'model2_state_dict': model2.state_dict(),
+            'optimizer2_state_dict': optimizer2.state_dict()
         }, checkpoint_name)
 
     # test trained model
-    test_perp = evaluate(model, test_iter, text_field, args)
+    test_perp = evaluate(model, model2, test_iter, text_field, args)
     print("TEST [EPOCH %d]: PERPLEXITY %.5lf" % (epoch, test_perp))
 
 

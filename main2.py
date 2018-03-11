@@ -160,7 +160,8 @@ def main():
     )
 
     lr = args.initial_lr
-    model = CondCopy(text_field.vocab.vectors, args.context_size, args.dropout) 
+    model = CondCopy(text_field.vocab.vectors, args.context_size, args.dropout)
+    model2 = CopyProb(text_field.vocab.vectors, args.context_size, args.dropout) 
 
     # Specify embedding weights
     embedding_dim = (model.vocab_size, model.hidden_size)
@@ -185,13 +186,14 @@ def main():
                           initializer'.format(args.init_weights))
     model.output_shortlist.weight.data = model.embedding_layer.weight.data
     
-    #location_dim = (model.hidden_size, model.hidden_size)
-    #model.output_location.weight.data = \
-        #Tensor(np.random.normal(size=location_dim))
+    location_dim = (model.hidden_size, model.hidden_size)
+    model.output_location.weight.data = \
+        Tensor(np.random.normal(size=location_dim))
 
-    switch_dim = (1, model.hidden_size)
-    model.switch.weight.data = \
+    switch_dim = (model.hidden_size, 1)
+    model2.switch.weight.data =\
         Tensor(np.random.normal(size=switch_dim))
+
 
     # Specify optimizer
     if args.optimizer == "Adamax":

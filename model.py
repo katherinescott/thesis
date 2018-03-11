@@ -70,6 +70,30 @@ class LBL(nn.Module):
 
 
 #Conditional Copy Model
+class CopyProb(nn.Module):
+    def __init__(self, pretrained_embeds, context_size, dropout=0.):
+        super(CopyProb, self).__init__()
+        self.context_size = context_size
+        self.hidden_size = pretrained_embeds.size(1)
+        self.vocab_size = pretrained_embeds.size(0)
+        self.vocab = pretrained_embeds
+
+        self.switch =\
+            nn.Linear(self.hidden_size, 1)
+
+    def get_train_parameters(self):
+        params = []
+        for param in self.parameters():
+            if param.requires_grad:
+                params.append(param)
+        return params
+
+    def forward(context_vectors):
+        switch = (F.sigmoid(self.switch(context_vectors)))
+        switch = sum(switch)/len(switch)
+
+        return switch
+
 
 class CondCopy(nn.Module):
     def __init__(self, pretrained_embeds, context_size, dropout=0.):
@@ -97,8 +121,8 @@ class CondCopy(nn.Module):
              nn.Linear(self.hidden_size, self.hidden_size)
 
         #switch probability
-        self.switch =\
-            nn.Linear(self.hidden_size, 1)
+        self.copy =\
+            CopyProb(pretrained_embeds, context_size, dropout=0.)
 
         self.dropout = nn.Dropout(p=dropout)
 
@@ -148,7 +172,7 @@ class CondCopy(nn.Module):
         #shortlist softmax
         shortlist_outputs = self.output_shortlist(context_vectors)
         assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
-        s_outputs = F.softmax(shortlist_outputs)
+        s_outputs = F.softmax(shortlist_outputs, dim=1)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
         #location softmax
@@ -183,7 +207,7 @@ class CondCopy(nn.Module):
 
         assert location_outputs.size() == (self.batch_size, self.context_size)
 
-        l_outputs = F.softmax(location_outputs)
+        l_outputs = F.softmax(location_outputs, dim=1)
 
         assert l_outputs.size() == (self.batch_size, self.context_size)
 
@@ -192,8 +216,7 @@ class CondCopy(nn.Module):
     #Note that pointer_probability_of_word5 might be zero. 
 
         #switch network -- probabililty 
-        switch = (F.sigmoid(self.switch(context_vectors)))
-        switch = sum(switch)/len(switch)
+        switch = self.copy(context_vectors)
 
         #compute pointer softmax
         #output = ((switch*l_outputs),  ((1-switch)*s_outputs))

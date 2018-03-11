@@ -88,7 +88,7 @@ class CopyProb(nn.Module):
                 params.append(param)
         return params
 
-    def forward(context_vectors):
+    def forward(self, context_vectors):
         switch = (F.sigmoid(self.switch(context_vectors)))
         switch = sum(switch)/len(switch)
 

@@ -66,8 +66,8 @@ def train(model, optimizer, data_iter, text_field, args):
                     else:
                         loss -= loss_function_avg(pointer, words_before[:,indices[j]])
                         total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
-                loss -= loss_function_avg(shortlist, target)
-                #total_loss -= loss_function_tot(shortlist, target).data.cpu().numpy()[0]
+                #loss -= loss_function_avg(shortlist, target)
+                total_loss -= loss_function_tot(shortlist, target).data.cpu().numpy()[0]
                 continue
             else:
                 loss += loss_function_avg(pointer, words_before[:,indices[i]])

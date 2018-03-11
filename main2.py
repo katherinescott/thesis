@@ -16,7 +16,7 @@ import torchtext
 from torchtext import data, datasets
 
 
-def train(model, optimizer, optimizer2, data_iter, text_field, args):
+def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
     model.train()
     loss_function_tot = nn.NLLLoss(size_average=False)
     loss_function_avg = nn.NLLLoss(size_average=True)
@@ -103,7 +103,7 @@ def train(model, optimizer, optimizer2, data_iter, text_field, args):
     return model, optimizer, np.exp(avg_loss)
 
 
-def evaluate(model, data_iter, text_field, args):
+def evaluate(model, model2, data_iter, text_field, args):
     model.eval()
     loss_function_tot = nn.NLLLoss(size_average=False)
     total_loss = 0
@@ -255,10 +255,10 @@ def main():
     print("Model: %s" % model)
     val_perps = []
     for epoch in range(args.start_epoch, args.epochs):
-        model, optimizer, optimizer2, train_perp = train(model, optimizer, optimizer2, train_iter,
+        model, optimizer, optimizer2, train_perp = train(model, model2, optimizer, optimizer2, train_iter,
                                              text_field, args)
         print("TRAIN [EPOCH %d]: PERPLEXITY %.5lf" % (epoch, train_perp))
-        val_perp = evaluate(model, val_iter, text_field, args)
+        val_perp = evaluate(model, model2, val_iter, text_field, args)
         print("VALIDATE [EPOCH %d]: PERPLEXITY %.5lf" % (epoch, val_perp))
         val_perps.append(val_perp)
 

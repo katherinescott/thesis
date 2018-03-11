@@ -208,7 +208,7 @@ def main():
     model.output_location.weight.data = \
         Tensor(np.random.normal(size=location_dim))
 
-    switch_dim = (model.hidden_size, 1)
+    switch_dim = (model2.hidden_size, 1)
     model2.switch.weight.data =\
         Tensor(np.random.normal(size=switch_dim))
 

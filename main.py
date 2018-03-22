@@ -11,7 +11,6 @@ from config import args
 from model import LBL, CondCopy
 from torch import Tensor
 import torch.cuda
-import revtok
 
 
 def train(model, optimizer, data_iter, text_field, args):

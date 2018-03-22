@@ -27,6 +27,7 @@ def train(model, optimizer, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
+        print(context)
         target = (batch.target[-1, :]).cuda()
 
         batch_size = context.size(0)
@@ -206,12 +207,15 @@ def main():
     
     location_dim = (model.hidden_size, model.hidden_size)
     model.output_location.weight.data = \
-        Tensor(np.random.uniform(size=location_dim))
+        Tensor(np.random.normal(size=location_dim))
 
     copy_dim = (1, model.hidden_size)
     model.copy.weight.data =\
         Tensor(np.random.uniform(size=copy_dim))
 
+    model.output_shortlist.bias.data.fill_(0)
+    model.output_location.bias.data.fill_(0)
+    model.copy.bias.data.fill_(0)
 
     # Specify optimizer
     if args.optimizer == "Adamax":

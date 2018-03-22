@@ -164,26 +164,30 @@ class CondCopy(nn.Module):
         assert embeddings.size() == \
             (self.batch_size, int(self.context_size/10), self.hidden_size)
 
-        
+        embeds2 = F.relu(embeddings)
+
         #get context vectors
         context_vectors = self.context_layer(embeddings.view(
                 self.batch_size, int(self.context_size/10) * self.hidden_size))
         context_vectors = self.dropout(context_vectors)
         assert context_vectors.size() == (self.batch_size, self.hidden_size)
+
+        context_vecs2 = self.context_layer(embeds2.view(
+                self.batch_size, int(self.context_size/10) * self.hidden_size))
+        context_vecs2 = self.dropout(context_vecs2)
         
         #shortlist softmax
         shortlist_outputs = self.output_shortlist(context_vectors)
         assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
-        s_outputs = F.softmax(shortlist_outputs)
+        s_outputs = F.softmax(shortlist_outputs, dim=1)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
         #location softmax
 
-        l_tan = F.tanh(self.output_location(context_vectors))
+        l_cvecs = F.tanh(self.output_location(context_vecs2)) #possibly dont use?
 
-        assert l_tan.size() == (self.batch_size, self.hidden_size)
+        assert l_cvecs.size() == (self.batch_size, self.hidden_size)
 
-        l_cvecs = l_tan #torch.mul(context_vectors, l_tan)
 
         #(5) Multiply the output of step (4) by the matrix formed from the 4 context word embeddings (you will likely want to use batch matrix multiply (bmm) 
             #to accomplish this), to get scores that are batch_size x 4. Then apply a softmax to get a distribution over these preceding words.
@@ -209,7 +213,7 @@ class CondCopy(nn.Module):
 
         assert location_outputs.size() == (self.batch_size, int(self.context_size/10))
 
-        l_outputs = F.softmax(location_outputs)
+        l_outputs = F.softmax(location_outputs, dim=1)
 
         assert l_outputs.size() == (self.batch_size, int(self.context_size/10))
 

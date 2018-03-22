@@ -23,11 +23,11 @@ def train(model, optimizer, data_iter, text_field, args):
     total_loss = 0
     data_size = 0
 
+    text_field.vocab
     iter_len = len(data_iter)
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        print(context)
         target = (batch.target[-1, :]).cuda()
 
         batch_size = context.size(0)
@@ -180,7 +180,6 @@ def main():
 
     lr = args.initial_lr
     model = CondCopy(text_field.vocab.vectors, args.context_size, args.dropout)
-    model2 = CopyProb(text_field.vocab.vectors, args.context_size, args.dropout) 
 
     # Specify embedding weights
     embedding_dim = (model.vocab_size, model.hidden_size)

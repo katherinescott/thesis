@@ -11,6 +11,7 @@ from config import args
 from model import LBL, CondCopy
 from torch import Tensor
 import torch.cuda
+import revtok
 
 
 def train(model, optimizer, data_iter, text_field, args):
@@ -25,11 +26,13 @@ def train(model, optimizer, data_iter, text_field, args):
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
+        print(text_field.reverse(target.data))
         batch_size = context.size(0)
         # zero out gradients
         optimizer.zero_grad()
         # get output
         output = model(context).cuda()
+        print(text_field.reverse(output))
         # calculate loss
         loss = loss_function_avg(output, target)
         total_loss += loss_function_tot(output, target).data.cpu().numpy()[0]

@@ -32,7 +32,7 @@ def train(model, optimizer, data_iter, text_field, args):
         target = (batch.target[-1, :]).cuda()
 
         for key,val in text_field.vocab.stoi.items():
-            if torch.equal(Variable(text_field.vocab.vectors[val]), target):
+            if torch.equal(Variable(text_field.vocab.vectors[val]).cuda(), target):
                 print(key)
 
         batch_size = context.size(0)

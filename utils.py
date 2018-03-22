@@ -1,7 +1,6 @@
 import os
 import zipfile
 import torchtext
-import revtok
 from torchtext import data, datasets
 
 """
@@ -24,7 +23,7 @@ def load_ptb(ptb_path='data.zip', ptb_dir='data', bptt_len=5, batch_size=1,
     DEV = 0 if gpu else -1
 
     text_field = data.ReversibleField(sequential=True, lower=True, include_lengths=True, batch_first=True,
-                            init_token="<s>")#, eos_token="</s>")
+                            init_token="<s>", eos_token="</s>")
     train = datasets.LanguageModelingDataset(os.path.join(
             ptb_dir, 'train.txt'), text_field, newline_eos=False)
     val = datasets.LanguageModelingDataset(os.path.join(

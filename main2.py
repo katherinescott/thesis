@@ -29,8 +29,8 @@ def train(model, optimizer, data_iter, text_field, args):
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
-
-        for key,val in tex_field.vocab.stoi.items():
+        print(target)
+        for key,val in text_field.vocab.stoi.items():
             if val == target:
                 print(key)
 

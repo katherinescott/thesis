@@ -240,13 +240,15 @@ def main():
             args.start_epoch = checkpoint["start_epoch"]
             model.load_state_dict(checkpoint["model_state_dict"])
             optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+            model2.load_state_dict(checkpoint["model2_state_dict"])
+            optimizer2.load_state_dict(checkpoint["optimizer2_state_dict"])
             print("=> loaded checkpoint %s (start at epoch %d)"
                   % (filename, args.start_epoch))
         else:
             print("=> no checkpoint found at %s" % filename)
         # just test and return if mode is test
         if args.mode == "test":
-            test_perp = evaluate(model, test_iter, text_field, args)
+            test_perp = evaluate(model, model2, test_iter, text_field, args)
             print("TEST PERPLEXITY %.5lf" % test_perp)
             return
 

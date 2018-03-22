@@ -23,12 +23,16 @@ def train(model, optimizer, data_iter, text_field, args):
     total_loss = 0
     data_size = 0
 
-    print(text_field.vocab.stoi['francisco'])
+    #print(text_field.vocab.stoi['francisco'])
     iter_len = len(data_iter)
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
+
+        for key,val in tex_field.vocab.stoi.items():
+            if val == target:
+                print(key)
 
         batch_size = context.size(0)
 

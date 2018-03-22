@@ -124,8 +124,8 @@ class CondCopy(nn.Module):
 
         #switch probability
         self.copy =\
-            #CopyProb(pretrained_embeds, context_size, dropout=0.)
             nn.Linear(self.hidden_size, 1)
+            #CopyProb(pretrained_embeds, context_size, dropout=0.)
 
         self.dropout = nn.Dropout(p=dropout)
 

@@ -124,7 +124,8 @@ class CondCopy(nn.Module):
 
         #switch probability
         self.copy =\
-            CopyProb(pretrained_embeds, context_size, dropout=0.)
+            #CopyProb(pretrained_embeds, context_size, dropout=0.)
+            nn.Linear(self.hidden_size, 1)
 
         self.dropout = nn.Dropout(p=dropout)
 
@@ -184,7 +185,7 @@ class CondCopy(nn.Module):
 
         #location softmax
 
-        l_cvecs = F.tanh(self.output_location(context_vecs2)) #possibly dont use?
+        l_cvecs = self.output_location(context_vecs2) #took out the outer F.tanh #possibly dont use?
 
         assert l_cvecs.size() == (self.batch_size, self.hidden_size)
 
@@ -222,7 +223,9 @@ class CondCopy(nn.Module):
     #Note that pointer_probability_of_word5 might be zero. 
 
         #switch network -- probabililty 
-        switch = self.copy(context_vectors)
+        switch = (F.sigmoid(self.switch(context_vecs2)))
+        switch = sum(switch)/len(switch)
+
 
         #compute pointer softmax
         #output = ((switch*l_outputs),  ((1-switch)*s_outputs))

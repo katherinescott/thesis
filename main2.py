@@ -16,7 +16,7 @@ import torchtext
 from torchtext import data, datasets
 
 
-def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
+def train(model, optimizer, data_iter, text_field, args):
     model.train()
     loss_function_tot = nn.NLLLoss(size_average=False)
     loss_function_avg = nn.NLLLoss(size_average=True)
@@ -37,7 +37,7 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
 
         # zero out gradients
         optimizer.zero_grad()
-        optimizer2.zero_grad()
+        #optimizer2.zero_grad()
         # get output
         pointer, shortlist = model(context[:,-5:])
         shortlist = shortlist.cuda()
@@ -50,7 +50,7 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
         
-        loss2 = loss_function_avg(shortlist, target)
+        #loss2 = loss_function_avg(shortlist, target)
         
         indices = []
         for i in range(0,words_before.size(1)):
@@ -59,14 +59,14 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
 
         if len(indices) == 0:
             for i in range(0, len(indices)):
-                loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
+                loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
                 total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
-            loss2 -= loss_function_avg(shortlist, target)
+            #loss2 -= loss_function_avg(shortlist, target)
 
         else:
             for i in range(0,len(indices)):
                 if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
-                    loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
+                    loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
                     #print(loss)
                     total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
                     #print(total_loss)
@@ -74,23 +74,24 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
                         if j == i: 
                             continue
                         else:
-                            loss2 -= loss_function_avg(pointer, words_before[:,indices[j]])
+                            loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
                             total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
                     total_loss -= loss_function_tot(shortlist, target).data.cpu().numpy()[0]
+                    loss -= loss_function_avg(shortlist, target)
                     continue
                 else:
-                    loss2 += loss_function_avg(pointer, words_before[:,indices[i]])
+                    loss += loss_function_avg(pointer, words_before[:,indices[i]])
                     total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
-            loss2 -= loss_function_avg(shortlist, target)
+            #loss2 -= loss_function_avg(shortlist, target)
 
 
         data_size += batch_size
         # calculate gradients
         loss.backward(retain_graph=True)
-        loss2.backward()
+        #loss2.backward()
         # update parameters
         optimizer.step()
-        optimizer2.step()
+        #optimizer2.step()
         # enforce the max_norm constraint
         #model.max_norm_embedding()
         # skip the last batch
@@ -100,10 +101,10 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
         batch_idx += 1
 
     avg_loss = total_loss / data_size
-    return model, model2, optimizer, optimizer2, np.exp(avg_loss)
+    return model, optimizer, np.exp(avg_loss)
 
 
-def evaluate(model, model2, data_iter, text_field, args):
+def evaluate(model, data_iter, text_field, args):
     model.eval()
     loss_function_tot = nn.NLLLoss(size_average=False)
     total_loss = 0
@@ -207,8 +208,8 @@ def main():
     model.output_location.weight.data = \
         Tensor(np.random.normal(size=location_dim))
 
-    switch_dim = (model2.hidden_size, 1)
-    model2.switch.weight.data =\
+    copy_dim = (model.hidden_size, 1)
+    model.switch.weight.data =\
         Tensor(np.random.uniform(size=switch_dim))
 
 
@@ -222,8 +223,8 @@ def main():
         optimizer = optim.Adam(model.get_train_parameters(),
                                lr=lr, weight_decay=args.l2)
 
-        optimizer2 = optim.Adam(model2.get_train_parameters(),
-                               lr=lr, weight_decay=args.l2)
+        #optimizer2 = optim.Adam(model2.get_train_parameters(),
+                               #lr=lr, weight_decay=args.l2)
     elif args.optimizer == "SGD":
         print("Optimizer: SGD")
         optimizer = optim.SGD(model.get_train_parameters(),
@@ -240,15 +241,15 @@ def main():
             args.start_epoch = checkpoint["start_epoch"]
             model.load_state_dict(checkpoint["model_state_dict"])
             optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-            model2.load_state_dict(checkpoint["model2_state_dict"])
-            optimizer2.load_state_dict(checkpoint["optimizer2_state_dict"])
+            #model2.load_state_dict(checkpoint["model2_state_dict"])
+            #optimizer2.load_state_dict(checkpoint["optimizer2_state_dict"])
             print("=> loaded checkpoint %s (start at epoch %d)"
                   % (filename, args.start_epoch))
         else:
             print("=> no checkpoint found at %s" % filename)
         # just test and return if mode is test
         if args.mode == "test":
-            test_perp = evaluate(model, model2, test_iter, text_field, args)
+            test_perp = evaluate(model, test_iter, text_field, args)
             print("TEST PERPLEXITY %.5lf" % test_perp)
             return
 
@@ -256,10 +257,10 @@ def main():
     print("Model: %s" % model)
     val_perps = []
     for epoch in range(args.start_epoch, args.epochs):
-        model, model2, optimizer, optimizer2, train_perp = train(model, model2, optimizer, optimizer2, train_iter,
+        model, optimizer, train_perp = train(model, model2, optimizer, optimizer2, train_iter,
                                              text_field, args)
         print("TRAIN [EPOCH %d]: PERPLEXITY %.5lf" % (epoch, train_perp))
-        val_perp = evaluate(model, model2, val_iter, text_field, args)
+        val_perp = evaluate(model, val_iter, text_field, args)
         print("VALIDATE [EPOCH %d]: PERPLEXITY %.5lf" % (epoch, val_perp))
         val_perps.append(val_perp)
 
@@ -275,12 +276,12 @@ def main():
             for param_group in optimizer.param_groups:
                 param_group['lr'] = lr
 
-            for param_group in optimizer2.param_groups:
-                param_group['lr'] = lr
+            #for param_group in optimizer2.param_groups:
+                #param_group['lr'] = lr
 
             # test model every 5 epochs
         if epoch % 5 == 0:
-            test_perp = evaluate(model, model2, test_iter, text_field, args)
+            test_perp = evaluate(model, test_iter, text_field, args)
             print("TEST [EPOCH %d]: PERPLEXITY %.5lf" % (epoch, test_perp))
 
         # saving model
@@ -295,12 +296,12 @@ def main():
             'args': args,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
-            'model2_state_dict': model2.state_dict(),
-            'optimizer2_state_dict': optimizer2.state_dict()
+            #'model2_state_dict': model2.state_dict(),
+            #'optimizer2_state_dict': optimizer2.state_dict()
         }, checkpoint_name)
 
     # test trained model
-    test_perp = evaluate(model, model2, test_iter, text_field, args)
+    test_perp = evaluate(model, test_iter, text_field, args)
     print("TEST [EPOCH %d]: PERPLEXITY %.5lf" % (epoch, test_perp))
 
 

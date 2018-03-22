@@ -23,7 +23,7 @@ def train(model, optimizer, data_iter, text_field, args):
     total_loss = 0
     data_size = 0
 
-    print(text_field.vocab.itos)
+    print(text_field.vocab.stoi[0])
     iter_len = len(data_iter)
     batch_idx = 0
     for batch in data_iter:

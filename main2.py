@@ -23,7 +23,7 @@ def train(model, optimizer, data_iter, text_field, args):
     total_loss = 0
     data_size = 0
 
-    print(text_field.vocab.vectors[text_field.vocab.stoi['services']])
+    #print(text_field.vocab.vectors[text_field.vocab.stoi['services']])
     iter_len = len(data_iter)
     batch_idx = 0
     for batch in data_iter:
@@ -31,7 +31,7 @@ def train(model, optimizer, data_iter, text_field, args):
         target = (batch.target[-1, :]).cuda()
 
         for key,val in text_field.vocab.stoi.items():
-            if torch.equal(text_vield.vocab.vectors[val], target):
+            if torch.equal(text_field.vocab.vectors[val], target):
                 print(key)
 
         batch_size = context.size(0)

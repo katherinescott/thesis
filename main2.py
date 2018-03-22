@@ -26,14 +26,14 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
     iter_len = len(data_iter)
     batch_idx = 0
     for batch in data_iter:
-        context = torch.transpose(batch.text, 0, 1).cuda()
+        context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
 
         batch_size = context.size(0)
 
         #pointer_vocab = text_field.build_vocab(batch.text, vectors=torchtext.vocab.GloVe(name='6B', dim=100))
 
-        words_before = context[:,:-5].cuda() #[:, :-5]
+        words_before = context[:,:-5] #[:, :-5]
 
         # zero out gradients
         optimizer.zero_grad()
@@ -115,7 +115,7 @@ def evaluate(model, model2, data_iter, text_field, args):
         target = (batch.target[-1, :]) #.cuda()
         batch_size = context.size(0)
 
-        words_before = context[:,:-5].cuda() #[:, :-5]
+        words_before = context[:,:-5] #[:, :-5]
 
         # get model output
         pointer, shortlist = model(context[:,-5:])

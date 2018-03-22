@@ -30,6 +30,10 @@ def train(model, optimizer, data_iter, text_field, args):
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
 
+        for key,val in text_field.vocab.stoi.items():
+            if torch.equal(text_vield.vocab.vectors[val], target):
+                print(key)
+
         batch_size = context.size(0)
 
         #pointer_vocab = text_field.build_vocab(batch.text, vectors=torchtext.vocab.GloVe(name='6B', dim=100))

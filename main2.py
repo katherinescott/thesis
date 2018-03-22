@@ -209,7 +209,7 @@ def main():
 
     switch_dim = (model2.hidden_size, 1)
     model2.switch.weight.data =\
-        Tensor(np.uniform(size=switch_dim))
+        Tensor(np.random.uniform(size=switch_dim))
 
 
     # Specify optimizer

@@ -112,10 +112,10 @@ def evaluate(model, model2, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        target = (batch.target[-1, :]) #.cuda()
+        target = (batch.target[-1, :]).cuda()
         batch_size = context.size(0)
 
-        words_before = context[:,:-5] #[:, :-5]
+        words_before = context[:,:-5].cuda() #[:, :-5]
 
         # get model output
         pointer, shortlist = model(context[:,-5:])

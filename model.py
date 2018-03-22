@@ -176,6 +176,7 @@ class CondCopy(nn.Module):
         context_vecs2 = self.context_layer(embeds2.view(
                 self.batch_size, int(self.context_size/10) * self.hidden_size))
         context_vecs2 = self.dropout(context_vecs2)
+        assert context_vecs2.size() == (self.batch_size, self.hidden_size)
         
         #shortlist softmax
         shortlist_outputs = self.output_shortlist(context_vectors)

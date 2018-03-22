@@ -223,7 +223,7 @@ class CondCopy(nn.Module):
     #Note that pointer_probability_of_word5 might be zero. 
 
         #switch network -- probabililty 
-        switch = (F.sigmoid(self.switch(context_vecs2)))
+        switch = (F.sigmoid(self.copy(context_vecs2)))
         switch = sum(switch)/len(switch)
 
 

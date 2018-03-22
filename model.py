@@ -189,7 +189,7 @@ class CondCopy(nn.Module):
 
         #location softmax
 
-        l_cvecs = self.output_location(context_vecs2) #took out the outer F.tanh #possibly dont use?
+        l_cvecs = F.tanh(self.output_location(context_vecs2)) #took out the outer F.tanh #possibly dont use?
 
         assert l_cvecs.size() == (self.batch_size, self.hidden_size)
 

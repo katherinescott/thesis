@@ -209,8 +209,8 @@ def main():
         Tensor(np.random.normal(size=location_dim))
 
     copy_dim = (model.hidden_size, 1)
-    model.switch.weight.data =\
-        Tensor(np.random.uniform(size=switch_dim))
+    model.copy.weight.data =\
+        Tensor(np.random.uniform(size=copy_dim))
 
 
     # Specify optimizer

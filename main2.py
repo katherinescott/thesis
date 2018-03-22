@@ -257,7 +257,7 @@ def main():
     print("Model: %s" % model)
     val_perps = []
     for epoch in range(args.start_epoch, args.epochs):
-        model, optimizer, train_perp = train(model, model2, optimizer, optimizer2, train_iter,
+        model, optimizer, train_perp = train(model, optimizer, train_iter,
                                              text_field, args)
         print("TRAIN [EPOCH %d]: PERPLEXITY %.5lf" % (epoch, train_perp))
         val_perp = evaluate(model, val_iter, text_field, args)

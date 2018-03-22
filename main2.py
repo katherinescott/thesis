@@ -27,21 +27,21 @@ def train(model, model2, optimizer, optimizer2, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
-        target = (batch.target[-1, :]) #.cuda()
+        target = (batch.target[-1, :]).cuda()
 
         batch_size = context.size(0)
 
         #pointer_vocab = text_field.build_vocab(batch.text, vectors=torchtext.vocab.GloVe(name='6B', dim=100))
 
-        words_before = context[:,:-5] #.cuda() #[:, :-5]
+        words_before = context[:,:-5].cuda() #[:, :-5]
 
         # zero out gradients
         optimizer.zero_grad()
         optimizer2.zero_grad()
         # get output
         pointer, shortlist = model(context[:,-5:])
-        shortlist = shortlist #.cuda()
-        pointer = pointer #.cuda()
+        shortlist = shortlist.cuda()
+        pointer = pointer.cuda()
         # calculate loss
         #pdb.set_trace()
         loss = loss_function_avg(shortlist, target)
@@ -209,7 +209,7 @@ def main():
 
     switch_dim = (model2.hidden_size, 1)
     model2.switch.weight.data =\
-        Tensor(np.random.normal(size=switch_dim))
+        Tensor(np.uniform(size=switch_dim))
 
 
     # Specify optimizer

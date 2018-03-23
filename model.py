@@ -231,7 +231,7 @@ class CondCopy(nn.Module):
         #pre_mat = cumulate 
 
         #switch network -- probabililty 
-        switch = (F.sigmoid(self.copy(context_vectors)) + F.sigmoid(self.copy(context_vecs2)))
+        switch = (F.sigmoid(self.copy(context_vecs2)))
         switch = sum(switch)/len(switch)
 
 

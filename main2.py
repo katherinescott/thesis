@@ -49,7 +49,6 @@ def train(model, optimizer, data_iter, text_field, args):
         # get output
         pointer, shortlist = model(context[:,-5:])
         shortlist = shortlist.cuda()
-        print(shortlist)
         pointer = pointer.cuda()
         # calculate loss
         #pdb.set_trace()
@@ -178,8 +177,8 @@ def evaluate(model, data_iter, text_field, args):
 
 def main():
     train_iter, val_iter, test_iter, text_field = utils.load_ptb(
-        ptb_path='data.zip',
-        ptb_dir='data',
+        ptb_path='data2.zip',
+        ptb_dir='data2',
         bptt_len=args.context_size,
         batch_size=args.batch_size,
         gpu=args.GPU,

@@ -31,7 +31,7 @@ def train(model, optimizer, data_iter, text_field, args):
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
 
-        print(target)
+        #print(target)
 
         #for key,val in text_field.vocab.stoi.items():
             #if torch.equal(Variable(text_field.vocab.vectors[val]), target):

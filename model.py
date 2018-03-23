@@ -212,7 +212,7 @@ class CondCopy(nn.Module):
 
         l_cvecs = switch*l_cvecs
 
-        assert l_cvecs.size() == (self.batch_size, self.hidden_size
+        assert l_cvecs.size() == (self.batch_size, self.hidden_size)
 
 
         #(5) Multiply the output of step (4) by the matrix formed from the 4 context word embeddings (you will likely want to use batch matrix multiply (bmm) 

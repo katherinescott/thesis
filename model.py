@@ -201,18 +201,24 @@ class CondCopy(nn.Module):
         s_outputs = F.softmax(shortlist_outputs, dim=1)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
+        
+        #switch network -- probabililty 
+        switch = (F.sigmoid(self.copy(context_vectors)))
+        switch = (sum(switch)/(len(switch)
+
         #location softmax
 
         l_cvecs = F.tanh(self.output_location(context_vecs2)) #took out the outer F.tanh #possibly dont use?
 
-        assert l_cvecs.size() == (self.batch_size, self.hidden_size)
+        l_cvecs = switch*l_cvecs
+
+        assert l_cvecs.size() == (self.batch_size, self.hidden_size
 
 
         #(5) Multiply the output of step (4) by the matrix formed from the 4 context word embeddings (you will likely want to use batch matrix multiply (bmm) 
             #to accomplish this), to get scores that are batch_size x 4. Then apply a softmax to get a distribution over these preceding words.
 
-
-        location_outputs = torch.bmm(embeddings, l_cvecs.view(self.batch_size, self.hidden_size, 1).contiguous()) #or embeddings instead
+        location_outputs = torch.bmm(embeddings, l_cvecs.view(self.batch_size, self.hidden_size, 1).contiguous())
 
         assert location_outputs.size() == (self.batch_size, int(self.context_size/10), 1)
 
@@ -230,13 +236,10 @@ class CondCopy(nn.Module):
 
         #pre_mat = cumulate 
 
-        #switch network -- probabililty 
-        switch = (F.sigmoid(self.copy(context_vecs2)))
-        switch2 = (F.sigmoid(self.copy(context_vectors)))
-        switch = (sum(switch) + sum(switch2))/(len(switch) + len(switch2))
+
 
 
         #compute pointer softmax
         #output = ((switch*l_outputs),  ((1-switch)*s_outputs))
 
-        return torch.log(switch*l_outputs),  torch.log((1-switch)*s_outputs)
+        return torch.log(l_outputs),  torch.log((1-switch)*s_outputs)

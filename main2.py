@@ -29,7 +29,7 @@ def train(model, optimizer, data_iter, text_field, args):
     iter_len = len(data_iter)
     batch_idx = 0
     for batch in data_iter:
-        print(batch)
+        print(batch.text)
 
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()

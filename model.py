@@ -117,7 +117,7 @@ class CondCopy(nn.Module):
 
         self.context_layer2 = nn.Linear(
                 self.hidden_size * int(self.context_size/10),
-                self.hidden_size)
+                self.hidden_size, bias=False)
         # dot product + bias in the paper
         self.output_shortlist =\
             nn.Linear(self.hidden_size, self.vocab_size)

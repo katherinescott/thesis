@@ -198,7 +198,7 @@ class CondCopy(nn.Module):
         #shortlist softmax
         shortlist_outputs = self.output_shortlist(context_vectors)
         assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
-        s_outputs = F.softmax(shortlist_outputs, dim=1)
+        s_outputs = F.softmax(shortlist_outputs, dim=0)
         assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
         #location softmax
@@ -212,7 +212,7 @@ class CondCopy(nn.Module):
             #to accomplish this), to get scores that are batch_size x 4. Then apply a softmax to get a distribution over these preceding words.
 
 
-        location_outputs = torch.bmm(embeds2, l_cvecs.view(self.batch_size, self.hidden_size, 1).contiguous()) #or embeddings instead
+        location_outputs = torch.bmm(embeddings, l_cvecs.view(self.batch_size, self.hidden_size, 1).contiguous()) #or embeddings instead
 
         assert location_outputs.size() == (self.batch_size, int(self.context_size/10), 1)
 
@@ -220,7 +220,7 @@ class CondCopy(nn.Module):
 
         assert location_outputs.size() == (self.batch_size, int(self.context_size/10))
 
-        l_outputs = F.softmax(location_outputs, dim=1)
+        l_outputs = F.softmax(location_outputs, dim=0)
 
         assert l_outputs.size() == (self.batch_size, int(self.context_size/10))
 

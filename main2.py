@@ -25,6 +25,7 @@ def train(model, optimizer, data_iter, text_field, args):
     data_size = 0
 
     print(text_field.vocab.stoi['services'])
+    print(text_field.vocab.itos[316])
     #print(text_field.vocab.vectors[text_field.vocab.stoi['services']])
     iter_len = len(data_iter)
     batch_idx = 0

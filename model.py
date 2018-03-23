@@ -114,6 +114,10 @@ class CondCopy(nn.Module):
         self.context_layer = nn.Linear(
                 self.hidden_size * int(self.context_size/10),
                 self.hidden_size, bias=False)
+
+        self.context_layer2 = nn.Linear(
+                self.hidden_size * int(self.context_size/10),
+                self.hidden_size)
         # dot product + bias in the paper
         self.output_shortlist =\
             nn.Linear(self.hidden_size, self.vocab_size)
@@ -159,6 +163,15 @@ class CondCopy(nn.Module):
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
 
+        #length = context_words.size(1)
+
+        #cumulate = torch.zeros((length, self.batch_size, self.vocab_size))
+        #cumulate.scatter_(1, self.batch_size.unsqueeze(2), 1.0)
+
+        #point_scores = []
+        
+        #for i in range(length):
+
         #embedding layer
         embeddings = self.embedding_layer(context_words)
         # sanity check
@@ -176,7 +189,8 @@ class CondCopy(nn.Module):
         context_vectors = self.dropout(context_vectors)
         assert context_vectors.size() == (self.batch_size, self.hidden_size)
 
-        context_vecs2 = self.context_layer(embeds2.view(
+        #context vectors for pointer
+        context_vecs2 = self.context_layer2(embeds2.view(
                 self.batch_size, int(self.context_size/10) * self.hidden_size))
         context_vecs2 = self.dropout(context_vecs2)
         assert context_vecs2.size() == (self.batch_size, self.hidden_size)
@@ -197,22 +211,10 @@ class CondCopy(nn.Module):
         #(5) Multiply the output of step (4) by the matrix formed from the 4 context word embeddings (you will likely want to use batch matrix multiply (bmm) 
             #to accomplish this), to get scores that are batch_size x 4. Then apply a softmax to get a distribution over these preceding words.
 
-        #l_cvecs = l_cvecs[:,None,:]
-        #l_cvecs = l_cvecs.expand_as(embeddings).contiguous()
 
-        #fillers = torch.zeros(self.batch_size, (self.context_size-1), self.hidden_size).cuda()
-
-        #l_cvecs = torch.cat([l_cvecs, fillers], dim=1)
-
-        #assert l_cvecs.size() == (self.batch_size, self.context_size, self.hidden_size)
-
-        location_outputs = torch.bmm(embeddings, l_cvecs.view(self.batch_size, self.hidden_size, 1).contiguous())
+        location_outputs = torch.bmm(embeds2, l_cvecs.view(self.batch_size, self.hidden_size, 1).contiguous()) #or embeddings instead
 
         assert location_outputs.size() == (self.batch_size, int(self.context_size/10), 1)
-
-        #temp = []
-        #for i in range(0, self.context_size):
-            #temp.append(location_outputs[:,:,i])
 
         location_outputs = torch.squeeze(location_outputs)
 
@@ -226,8 +228,10 @@ class CondCopy(nn.Module):
     #distribution that tells you whether you copied or not. Then, p(word5 | ctx) = p(copied) * pointer_probability_of_word5 + (1 - p(copied)) * probability_of_word5_from_step3.  
     #Note that pointer_probability_of_word5 might be zero. 
 
+        #pre_mat = cumulate 
+
         #switch network -- probabililty 
-        switch = (F.sigmoid(self.copy(context_vectors)))
+        switch = (F.sigmoid(self.copy(context_vectors)) + F.sigmoid(self.copy(context_vecs2)))
         switch = sum(switch)/len(switch)
 
 

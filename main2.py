@@ -96,7 +96,7 @@ def train(model, optimizer, data_iter, text_field, args):
         data_size += batch_size
         # calculate gradients
         loss.backward()
-        nn.utils.clip_grad_norm(model.parameters(), 1)
+        #nn.utils.clip_grad_norm(model.parameters(), 1)
         #loss2.backward()
         # update parameters
         optimizer.step()

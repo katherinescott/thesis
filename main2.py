@@ -24,10 +24,13 @@ def train(model, optimizer, data_iter, text_field, args):
     total_loss = 0
     data_size = 0
 
+
     #print(text_field.vocab.vectors[text_field.vocab.stoi['services']])
     iter_len = len(data_iter)
     batch_idx = 0
     for batch in data_iter:
+        print(batch)
+
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
 

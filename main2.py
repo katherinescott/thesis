@@ -35,9 +35,9 @@ def train(model, optimizer, data_iter, text_field, args):
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
         target = target.cpu()
-        target_data = target.data.numpy()
-        print(target_data.shape)
-        print(target_data)
+        target_data = list(target.data.numpy())
+        target_words = [text_field.vocab.itos[x] for x in target_data]
+        print(target_words)
 
         # print(text_field.vocab.itos(target))
         #print(target)

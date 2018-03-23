@@ -204,7 +204,7 @@ class CondCopy(nn.Module):
         
         #switch network -- probabililty 
         switch = (F.sigmoid(self.copy(context_vectors)))
-        switch = (sum(switch)/(len(switch)
+        switch = sum(switch)/len(switch)
 
         #location softmax
 

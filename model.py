@@ -149,7 +149,7 @@ class CondCopy(nn.Module):
                         self.embedding_layer(to_rescale)))).data
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
-        self.copy_vec = Variable(torch.zeros(self.hidden_size, 1), requires_grad=True)
+        self.copy_vec = Variable(torch.ones(self.hidden_size, 1)) #requires_grad=True)
 
     def forward(self, context_words):
         self.batch_size = context_words.size(0)

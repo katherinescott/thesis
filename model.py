@@ -191,14 +191,16 @@ class CondCopy(nn.Module):
 
             a = F.softmax(z.transpose(0,1), dim=1).transpose(0,1)
             prefix_matrix = cumulate[:i + 1]
-            p_ptr = torch.sum(Variable(prefix_matrix) * a[:-1].unsqueeze(2).expand_as(prefix_matrix), 0).squeeze(0)
+            prob_ptr = torch.sum(Variable(prefix_matrix) * a[:-1].unsqueeze(2).expand_as(prefix_matrix), 0).squeeze(0)
 
             out = self.output_shortlist(cvecs)
             prob_vocab = F.softmax(out)
 
-            p = p_ptr + p_vocab * a[-1].unsqueeze(1).expand_as(p_vocab)
+            p = prob_ptr + prob_vocab * a[-1].unsqueeze(1).expand_as(p_vocab)
 
             probs.append(p)
+
+            ptr_scores.append(prob_ptr + a[-1].unsqueeze(1))
 
         return torch.log(torch.cat(probs).view(-1, self.vocab_size)), torch.log(torch.cat(ptr_scores).view(-1, self.vocab_size))
 

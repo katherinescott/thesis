@@ -185,7 +185,7 @@ class CondCopy(nn.Module):
             for j in range(i+1):
                 z.append(torch.sum(hiddens[j]*q, 1).view(-1))
             z.append(torch.mul(q, switch).view(-1))
-            z = torch.stack(z)
+            #z = torch.stack(z)
 
             a = F.softmax(z.transpose(0,1))
             prefix_matrix = cumulate_matrix[:i + 1]

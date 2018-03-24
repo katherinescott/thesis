@@ -131,6 +131,8 @@ class CondCopy(nn.Module):
 
         self.dropout = nn.Dropout(p=dropout)
 
+        self.copy_vec = Variable(torch.zeros(self.hidden_size, 1) requires_grad=True)
+
     def get_train_parameters(self):
         params = []
         for param in self.parameters():
@@ -149,7 +151,7 @@ class CondCopy(nn.Module):
                         self.embedding_layer(to_rescale)))).data
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
-        self.copy_vec = Variable(torch.ones(self.hidden_size, 1)) #requires_grad=True)
+        
 
     def forward(self, context_words):
         self.batch_size = context_words.size(0)
@@ -185,12 +187,12 @@ class CondCopy(nn.Module):
             switch = sum(switch)/len(switch)
 
             
-            self.copy_vec = self.copy_vec*switch
+            copy_prob = self.copy_vec*switch
 
             z = []
             for j in range(i+1):
                 z.append(torch.sum(hiddens[j]*q, 1).view(-1))
-            z.append(torch.mm(q, self.copy_vec).view(-1))
+            z.append(torch.mm(q, copy_prob).view(-1))
             z = torch.stack(z)
 
             a = F.softmax(z.transpose(0,1), dim=1).transpose(0,1)

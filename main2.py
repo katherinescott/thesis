@@ -33,7 +33,7 @@ def train(model, optimizer, data_iter, text_field, args):
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
         target_words = [text_field.vocab.itos[x] for x in target.data.tolist()]
-        print(target.data.tolist())
+        #print(target.data.tolist())
         #print target word in the last batch
         #print(target_words[-1])
 
@@ -49,13 +49,13 @@ def train(model, optimizer, data_iter, text_field, args):
         # get output
         pointer, shortlist = model(context[:,-5:])
         shortlist = shortlist.cuda()
+        pointer = pointer.cuda()
 
-        print(shortlist.data[:,-1].tolist())
+        #print(shortlist.data[:,-1].tolist())
         #get shortlist and pointer words, print out the predicted word in the last batch
         #shortlist_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
         #pointer_words = [text_field.vocab.itos[x] for x in pointer.data[:,-1].tolist()]
-
-        pointer = pointer.cuda()
+        
         # calculate loss
         #pdb.set_trace()
         loss = loss_function_avg(shortlist, target)

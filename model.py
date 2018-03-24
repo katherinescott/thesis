@@ -104,7 +104,6 @@ class CondCopy(nn.Module):
         self.context_size = context_size
         self.hidden_size = pretrained_embeds.size(1)
         self.vocab_size = pretrained_embeds.size(0)
-        self.vocab = pretrained_embeds
         
         #nn.Embedding(num embeddings, embedding dim)
         self.embedding_layer = nn.Embedding(
@@ -127,7 +126,7 @@ class CondCopy(nn.Module):
 
         #switch probability
         self.copy =\
-            nn.Linear(self.batch_size, 1)
+            nn.Linear(self.hidden_size, 1)
             #CopyProb(pretrained_embeds, context_size, dropout=0.)
 
         self.dropout = nn.Dropout(p=dropout)
@@ -180,6 +179,9 @@ class CondCopy(nn.Module):
             #switch probability
             switch = F.sigmoid(self.copy(cvecs.transpose(0,1)))
             switch = sum(switch)/len(switch)
+            
+            copy_vec = Variable(torch.ones(self.hidden_size, 1))
+            copy_vec = copy_vec*switch
 
             z = []
             for j in range(i+1):

@@ -211,7 +211,7 @@ def main():
     model.output_location.weight.data = \
         Tensor(np.random.normal(size=location_dim))
 
-    copy_dim = (1, model.batch_size)
+    copy_dim = (1, model.hidden_size)
     model.copy.weight.data =\
         Tensor(np.random.uniform(size=copy_dim))
 

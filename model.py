@@ -160,6 +160,8 @@ class CondCopy(nn.Module):
         probs = []
         hiddens = []
 
+        cvecs = torch.FloatTensor(self.batch_size, self.hidden_size).fill_(0)
+
         cumulate = torch.zeros((length, self.batch_size, self.vocab_size))
         cumulate.scatter_(2, context_words.transpose(0,1).data.type(torch.LongTensor).unsqueeze(2), 1.0)
 
@@ -194,8 +196,7 @@ class CondCopy(nn.Module):
             prob_ptr = torch.sum(Variable(prefix_matrix) * a[:-1].unsqueeze(2).expand_as(prefix_matrix), 0).squeeze(0)
 
             out = self.output_shortlist(cvecs)
-            prob_vocab = F.softmax(out)
-            print(prob_vocab)
+            prob_vocab = F.softmax(out, dim=1)
 
             p = prob_ptr + prob_vocab * a[-1].unsqueeze(1).expand_as(prob_vocab)
 

@@ -210,7 +210,7 @@ class CondCopy(nn.Module):
 
         l_cvecs = F.tanh(self.output_location(context_vecs2)) 
 
-        l_cvecs = switch* l_cvecs
+        l_cvecs = l_cvecs
 
         assert l_cvecs.size() == (self.batch_size, self.hidden_size)
 

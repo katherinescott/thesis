@@ -188,8 +188,10 @@ class CondCopy(nn.Module):
                 z.append(torch.sum(hiddens[j]*q, 1).view(-1))
             z.append(torch.mm(q, copy_vec).view(-1))
             z = torch.stack(z)
+            print(z)
 
             a = F.softmax(z.transpose(0,1), dim=1).transpose(0,1)
+            print(a)
             prefix_matrix = cumulate[:i + 1]
             prob_ptr = torch.sum(Variable(prefix_matrix) * a[:-1].unsqueeze(2).expand_as(prefix_matrix), 0).squeeze(0)
 

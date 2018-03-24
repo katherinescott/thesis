@@ -159,8 +159,6 @@ class CondCopy(nn.Module):
 
         length = context_words.size(1)
 
-        words = context_
-
         probs = []
 
         cumulate = torch.zeros((length, self.batch_size, self.vocab_size))

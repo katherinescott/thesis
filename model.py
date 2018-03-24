@@ -159,10 +159,12 @@ class CondCopy(nn.Module):
 
         length = context_words.size(1)
 
+        words = context_
+
         probs = []
 
         cumulate = torch.zeros((length, self.batch_size, self.vocab_size))
-        cumulate.scatter_(1, context_words.unsqueeze(2), 1.0)
+        cumulate.scatter_(1, context_words.type(torch.LongTensor).unsqueeze(2), 1.0)
 
         point_scores = []
         

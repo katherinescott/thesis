@@ -50,7 +50,7 @@ def train(model, optimizer, data_iter, text_field, args):
         pointer, shortlist = model(context[:,-5:])
         shortlist = shortlist.cuda()
 
-        print(shortlist.data.tolist())
+        print(shortlist.data.tolist()[:,-1])
         #get shortlist and pointer words, print out the predicted word in the last batch
         #shortlist_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
         #pointer_words = [text_field.vocab.itos[x] for x in pointer.data[:,-1].tolist()]

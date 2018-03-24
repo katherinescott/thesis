@@ -169,7 +169,7 @@ class CondCopy(nn.Module):
         for i in range(length):
             embeddings = self.embedding_layer(context_words.transpose(0,1)[i]) #now its contxt x batch
             assert embeddings.size() == \
-            (self.batch_size, 1, self.hidden_size)
+            (int(self.context_size/10), self.batch_size, self.hidden_size)
 
             cvecs = self.context_layer(embeddings.view(self.batch_size, int(self.context_size/10) * self.hidden_size))
             q = F.tanh(self.output_location(cvecs))

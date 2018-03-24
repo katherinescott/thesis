@@ -177,9 +177,9 @@ class CondCopy(nn.Module):
             q = F.tanh(self.output_location(cvecs))
 
             #switch probability
-            switch = F.sigmoid(self.copy(cvecs.transpose(0,1)))
+            switch = F.sigmoid(self.copy(cvecs))
             switch = sum(switch)/len(switch)
-            
+
             copy_vec = Variable(torch.ones(self.hidden_size, 1))
             copy_vec = copy_vec*switch
 

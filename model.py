@@ -198,12 +198,12 @@ class CondCopy(nn.Module):
             print(prob_vocab)
 
             p = prob_ptr + prob_vocab * a[-1].unsqueeze(1).expand_as(prob_vocab)
-            print(p)
 
             probs.append(p)
-            print(probs)
 
             point_scores.append(prob_ptr + a[-1].unsqueeze(1))
+
+            print(torch.log(torch.cat(probs).view(-1, self.vocab_size)))
 
         return torch.log(torch.cat(probs).view(-1, self.vocab_size)), torch.log(torch.cat(point_scores).view(-1, self.vocab_size))
 

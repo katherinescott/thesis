@@ -196,7 +196,7 @@ class CondCopy(nn.Module):
             out = self.output_shortlist(cvecs)
             prob_vocab = F.softmax(out)
 
-            p = prob_ptr + prob_vocab * a[-1].unsqueeze(1).expand_as(p_vocab)
+            p = prob_ptr + prob_vocab * a[-1].unsqueeze(1).expand_as(prob_vocab)
 
             probs.append(p)
 

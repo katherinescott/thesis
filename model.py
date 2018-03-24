@@ -131,7 +131,7 @@ class CondCopy(nn.Module):
 
         self.dropout = nn.Dropout(p=dropout)
 
-        self.copy_vec = Variable(torch.zeros(self.hidden_size, 1) requires_grad=True)
+        self.copy_vec = Variable(torch.zeros(self.hidden_size, 1), requires_grad=True)
 
     def get_train_parameters(self):
         params = []

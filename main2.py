@@ -33,7 +33,7 @@ def train(model, optimizer, data_iter, text_field, args):
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
         target_words = [text_field.vocab.itos[x] for x in target.data.tolist()]
-        
+        print(target.data.tolist())
         #print target word in the last batch
         #print(target_words[-1])
 

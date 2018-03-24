@@ -206,7 +206,9 @@ class CondCopy(nn.Module):
 
             print(sum(probs)/len(probs))
 
-        return torch.log(torch.cat(probs).view(-1, self.vocab_size)), torch.log(torch.cat(point_scores).view(-1, self.vocab_size))
+            probs = sum(probs)/len(probs)
+
+        return torch.log(probs), torch.log(torch.cat(point_scores).view(-1, self.vocab_size))
 
 
 

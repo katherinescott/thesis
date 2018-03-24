@@ -127,7 +127,7 @@ class CondCopy(nn.Module):
 
         #switch probability
         self.copy =\
-            nn.Linear(self.hidden_size, 1)
+            nn.Linear(self.batch_size, 1)
             #CopyProb(pretrained_embeds, context_size, dropout=0.)
 
         self.dropout = nn.Dropout(p=dropout)
@@ -178,14 +178,14 @@ class CondCopy(nn.Module):
             q = F.tanh(self.output_location(cvecs))
 
             #switch probability
-            switch = F.sigmoid(self.copy(cvecs))
+            switch = F.sigmoid(self.copy(cvecs.transpose(0,1)))
             switch = sum(switch)/len(switch)
 
             z = []
             for j in range(i+1):
                 z.append(torch.sum(hiddens[j]*q, 1).view(-1))
-            z.append(torch.mul(q, switch).view(-1))
-            #z = torch.stack(z)
+            z.append(torch.mm(q, switch).view(-1))
+            z = torch.stack(z)
 
             a = F.softmax(z.transpose(0,1))
             prefix_matrix = cumulate_matrix[:i + 1]

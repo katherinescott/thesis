@@ -50,7 +50,7 @@ def train(model, optimizer, data_iter, text_field, args):
         pointer, shortlist = model(context[:,-5:])
         shortlist = shortlist.cuda()
 
-        #print(shortlist.data.tolist())
+        print(shortlist.data.tolist())
         #get shortlist and pointer words, print out the predicted word in the last batch
         #shortlist_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
         #pointer_words = [text_field.vocab.itos[x] for x in pointer.data[:,-1].tolist()]
@@ -110,7 +110,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # enforce the max_norm constraint
         #model.max_norm_embedding()
         # skip the last batch
-        if batch_idx >= iter_len - 2:
+        if batch_idx >= 1 #>= iter_len - 2:
             break
 
         batch_idx += 1

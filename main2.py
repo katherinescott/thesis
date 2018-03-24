@@ -33,14 +33,9 @@ def train(model, optimizer, data_iter, text_field, args):
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
         target_words = [text_field.vocab.itos[x] for x in target.data.tolist()]
-        #print(target_words)
-
-        # print(text_field.vocab.itos(target))
-        #print(target)
-
-        #for key,val in text_field.vocab.stoi.items():
-            #if torch.equal(Variable(text_field.vocab.vectors[val]), target):
-                #print(key)
+        
+        #print target word in the last batch
+        #print(target_words[-1])
 
         batch_size = context.size(0)
 
@@ -54,6 +49,12 @@ def train(model, optimizer, data_iter, text_field, args):
         # get output
         pointer, shortlist = model(context[:,-5:])
         shortlist = shortlist.cuda()
+
+        print(shortlist.data.tolist())
+        #get shortlist and pointer words, print out the predicted word in the last batch
+        #shortlist_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
+        #pointer_words = [text_field.vocab.itos[x] for x in pointer.data[:,-1].tolist()]
+
         pointer = pointer.cuda()
         # calculate loss
         #pdb.set_trace()
@@ -182,8 +183,8 @@ def evaluate(model, data_iter, text_field, args):
 
 def main():
     train_iter, val_iter, test_iter, text_field = utils.load_ptb(
-        ptb_path='data3.zip',
-        ptb_dir='data3',
+        ptb_path='data.zip',
+        ptb_dir='data',
         bptt_len=args.context_size,
         batch_size=args.batch_size,
         gpu=args.GPU,

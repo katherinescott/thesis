@@ -159,6 +159,7 @@ class CondCopy(nn.Module):
         length = context_words.size(1)
 
         probs = []
+        hiddens = []
 
         cumulate = torch.zeros((length, self.batch_size, self.vocab_size))
         cumulate.scatter_(2, context_words.transpose(0,1).data.type(torch.LongTensor).unsqueeze(2), 1.0)
@@ -171,16 +172,19 @@ class CondCopy(nn.Module):
                 #(int(self.context_size/10), self.batch_size, self.hidden_size)
 
             cvecs = self.context_layer2(embeddings) #.view(self.batch_size, int(self.context_size/10) * self.hidden_size))
+            
+            hiddens.append(cvecs)
+
             q = F.tanh(self.output_location(cvecs))
 
             #switch probability
             switch = F.sigmoid(self.copy(cvecs))
-            switch = sum(switch)/len(switch)
+            #switch = sum(switch)/len(switch)
 
             z = []
             for j in range(i+1):
-                z.append(torch.sum(cvecs[j]*q, 1).view(-1))
-            z.append(torch.mul(q, switch).view(-1))
+                z.append(torch.sum(hiddens[j]*q, 1).view(-1))
+            z.append(torch.mm(q, switch).view(-1))
             z = torch.stack(z)
 
             a = F.softmax(z.transpose(0,1))

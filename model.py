@@ -204,9 +204,9 @@ class CondCopy(nn.Module):
 
             point_scores.append(prob_ptr + a[-1].unsqueeze(1))
 
-            print(torch.cat(probs))
+            #print(probs)
 
-        return torch.log(torch.cat(probs).view(-1, self.vocab_size)), torch.log(torch.cat(point_scores).view(-1, self.vocab_size))
+        return torch.log(sum(probs)/len(probs)), torch.log(torch.cat(point_scores).view(-1, self.vocab_size))
 
 
 

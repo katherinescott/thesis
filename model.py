@@ -210,7 +210,7 @@ class CondCopy(nn.Module):
 
         l_cvecs = F.tanh(self.output_location(context_vecs2)) 
 
-        l_cvecs = switch*l_cvecs
+        l_cvecs = switch* l_cvecs
 
         assert l_cvecs.size() == (self.batch_size, self.hidden_size)
 
@@ -242,4 +242,4 @@ class CondCopy(nn.Module):
         #compute pointer softmax
         #output = ((switch*l_outputs),  ((1-switch)*s_outputs))
 
-        return torch.log(l_outputs),  torch.log((1-switch)*s_outputs)
+        return torch.log(switch*l_outputs),  torch.log((1-switch)*s_outputs)

@@ -149,6 +149,8 @@ class CondCopy(nn.Module):
                         self.embedding_layer(to_rescale)))).data
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
+        self.copy_vec = Variable(torch.zeros(self.hidden_size, 1), requires_grad=True)
+
     def forward(self, context_words):
         self.batch_size = context_words.size(0)
         assert context_words.size(1) == int(self.context_size/10), \
@@ -182,7 +184,7 @@ class CondCopy(nn.Module):
             switch = F.sigmoid(self.copy(cvecs))
             switch = sum(switch)/len(switch)
 
-            copy_vec = Variable(torch.ones(self.hidden_size, 1))
+            
             copy_vec = copy_vec*switch
 
             z = []

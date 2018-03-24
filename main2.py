@@ -209,7 +209,7 @@ def main():
     
     location_dim = (model.hidden_size, model.hidden_size)
     model.output_location.weight.data = \
-        Tensor(np.random.normal(size=location_dim))
+        Tensor(np.random.uniform(size=location_dim))
 
     copy_dim = (1, model.hidden_size)
     model.copy.weight.data =\

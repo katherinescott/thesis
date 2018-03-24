@@ -31,7 +31,7 @@ parser.add_argument("--optimizer", help="Optimizer type",
                     type=str, default="Adam")
 parser.add_argument("--init_weights",
                     help="Choose weight initialization for embedding matrix",
-                    type=str, default="rand_norm")
+                    type=str, default="rand_unif")
 parser.add_argument("--resume",
                     help="Load model instead of training completely new model",
                     type=str, default="NONE")

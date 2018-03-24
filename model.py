@@ -185,7 +185,7 @@ class CondCopy(nn.Module):
             switch = sum(switch)/len(switch)
 
             
-            copy_vec = copy_vec*switch
+            self.copy_vec = self.copy_vec*switch
 
             z = []
             for j in range(i+1):

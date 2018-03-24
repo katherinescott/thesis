@@ -64,7 +64,6 @@ def train(model, optimizer, data_iter, text_field, args):
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
         
-        #loss2 = loss_function_avg(shortlist, target)
         
         indices = []
         for i in range(0,words_before.size(1)):
@@ -74,29 +73,19 @@ def train(model, optimizer, data_iter, text_field, args):
         if len(indices) == 0:
             for i in range(0, len(indices)):
                 loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
-                #total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
-            #loss2 -= loss_function_avg(shortlist, target)
 
         else:
             for i in range(0,len(indices)):
                 if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
                     loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
-                    #print(loss)
-                    #total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
-                    #print(total_loss)
-                    for j in range(i):
-                        if j == i: 
-                            continue
-                        else:
-                            loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
-                            #total_loss -= loss_function_tot(pointer, words_before[:,indices[j]]).data.cpu().numpy()[0]
-                    #total_loss -= loss_function_tot(shortlist, target).data.cpu().numpy()[0]
-                    #loss -= loss_function_avg(shortlist, target)
+                    #for j in range(i):
+                        #if j == i: 
+                            #continue
+                        #else:
+                            #loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
                     continue
                 else:
                     loss += loss_function_avg(pointer, words_before[:,indices[i]])
-                    #total_loss += loss_function_tot(pointer, words_before[:,indices[i]]).data.cpu().numpy()[0]
-            #loss2 -= loss_function_avg(shortlist, target)
 
 
         data_size += batch_size
@@ -110,7 +99,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # enforce the max_norm constraint
         #model.max_norm_embedding()
         # skip the last batch
-        if batch_idx >= 1: #>= iter_len - 2:
+        if batch_idx >= iter_len - 2:
             break
 
         batch_idx += 1

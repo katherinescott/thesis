@@ -215,7 +215,7 @@ def main():
     model.copy.weight.data.uniform_(-0.1, 0.1) #=\
         #Tensor(np.random.uniform(size=copy_dim))
 
-    self.copy_vec.data.uniform_(-0.1, 0.1)
+    model.copy_vec.data.uniform_(-0.1, 0.1)
 
     model.output_shortlist.bias.data.fill_(0)
     model.output_location.bias.data.fill_(0)

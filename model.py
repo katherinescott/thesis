@@ -186,7 +186,7 @@ class CondCopy(nn.Module):
             z = []
             for j in range(i+1):
                 z.append(torch.sum(hiddens[j]*q, 1).view(-1))
-            z.append(torch.mm(q, switch).view(-1))
+            z.append(torch.mm(q, copy_vec).view(-1))
             z = torch.stack(z)
 
             a = F.softmax(z.transpose(0,1)).transpose(0,1)

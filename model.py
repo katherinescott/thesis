@@ -216,7 +216,7 @@ class CondCopy(nn.Module):
 
         #return torch.log(ptr_probs), torch.log(s_probs)
 
-        return torch.log(torch.cat(point_scores).view(-1, self.vocab_size)), torch.log(torch.cat(probs).view(-1, self.vocab_size))
+        #return torch.log(torch.cat(point_scores).view(-1, self.vocab_size)), torch.log(torch.cat(probs).view(-1, self.vocab_size))
 
         return torch.log(prob_ptr + a[-1].unsqueeze(1).view(-1, self.vocab_size)), torch.log(p.view(-1, self.vocab_size))
 

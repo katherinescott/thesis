@@ -37,6 +37,9 @@ def train(model, optimizer, data_iter, text_field, args):
         #print target word in the last batch
         #print(target_words[-1])
 
+        print(context)
+        print(target)
+
         batch_size = context.size(0)
 
         #pointer_vocab = text_field.build_vocab(batch.text, vectors=torchtext.vocab.GloVe(name='6B', dim=100))
@@ -94,7 +97,6 @@ def train(model, optimizer, data_iter, text_field, args):
         data_size += batch_size
         # calculate gradients
         loss.backward()
-        nn.utils.clip_grad_norm(model.parameters(), 1)
         #loss2.backward()
         # update parameters
         optimizer.step()
@@ -190,8 +192,8 @@ def evaluate(model, data_iter, text_field, args):
 
 def main():
     train_iter, val_iter, test_iter, text_field = utils.load_ptb(
-        ptb_path='data3.zip',
-        ptb_dir='data3',
+        ptb_path='data.zip',
+        ptb_dir='data',
         bptt_len=args.context_size,
         batch_size=args.batch_size,
         gpu=args.GPU,

@@ -35,7 +35,7 @@ def train(model, optimizer, data_iter, text_field, args):
         target_words = [text_field.vocab.itos[x] for x in target.data.tolist()]
         #print(target.data.tolist())
         #print target word in the last batch
-        #print(target_words[-1])
+        print(target_words[-1])
 
         batch_size = context.size(0)
 

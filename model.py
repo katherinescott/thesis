@@ -226,7 +226,7 @@ class CondCopy(nn.Module):
 
         #pre_mat = cumulate 
 
-        output = torch.cat((1-switch)*s_outputs, switch*l_outputs, dim=1)
+        output = torch.log(torch.cat((1-switch)*s_outputs, switch*l_outputs, dim=1))
 
         #compute pointer softmax
         #output = ((switch*l_outputs),  ((1-switch)*s_outputs))

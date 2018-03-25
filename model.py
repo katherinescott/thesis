@@ -157,7 +157,7 @@ class CondCopy(nn.Module):
 
     def forward(self, context_words):
         self.batch_size = context_words.size(0)
-        assert context_words.size(1) == int(self.context_size), \
+        assert context_words.size(1) == int(self.context_size/10), \
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
 

@@ -180,7 +180,7 @@ def evaluate(model, data_iter, text_field, args):
         data_size += batch_size
 
         # skip last batch
-        if batch_idx >= iter_len - 2:
+        if batch_idx >=1: #iter_len - 2:
             break
 
         batch_idx += 1

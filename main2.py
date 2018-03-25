@@ -190,8 +190,8 @@ def evaluate(model, data_iter, text_field, args):
 
 def main():
     train_iter, val_iter, test_iter, text_field = utils.load_ptb(
-        ptb_path='data3.zip',
-        ptb_dir='data3',
+        ptb_path='data.zip',
+        ptb_dir='data',
         bptt_len=args.context_size,
         batch_size=args.batch_size,
         gpu=args.GPU,
@@ -226,12 +226,12 @@ def main():
     model.output_shortlist.weight.data = model.embedding_layer.weight.data
     
     location_dim = (model.hidden_size, model.hidden_size)
-    model.output_location.weight.data.uniform_(-0.1, 0.1) #=\
-        #Tensor(np.random.uniform(size=location_dim))
+    model.output_location.weight.data=\
+        Tensor(np.random.normal(size=location_dim))
 
     copy_dim = (1, model.hidden_size)
-    model.copy.weight.data.uniform_(-0.1, 0.1) #=\
-        #Tensor(np.random.uniform(size=copy_dim))
+    model.copy.weight.data=\
+        Tensor(np.random.normal(size=copy_dim))
 
     #model.copy_vec.data.uniform_(-0.1, 0.1)
 

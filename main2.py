@@ -44,7 +44,7 @@ def train(model, optimizer, data_iter, text_field, args):
 
         #pointer_vocab = text_field.build_vocab(batch.text, vectors=torchtext.vocab.GloVe(name='6B', dim=100))
 
-        #words_before = context[:,:-5].cuda() #[:, :-5]
+        words_before = context.cuda()
 
         # zero out gradients
         optimizer.zero_grad()
@@ -71,27 +71,27 @@ def train(model, optimizer, data_iter, text_field, args):
         #then index into 
         
         
-        # indices = []
-        # for i in range(0,words_before.size(1)):
-        #     if torch.equal(words_before[:,i], target):
-        #         indices.append(i)
+        indices = []
+        for i in range(0,words_before.size(1)):
+            if torch.equal(words_before[:,i], target):
+                indices.append(i)
 
-        # if len(indices) == 0:
-        #     for i in range(0, len(indices)):
-        #         loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
+        if len(indices) == 0:
+            for i in range(0, len(indices)):
+                loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
 
-        # else:
-        #     for i in range(0,len(indices)):
-        #         if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
-        #             loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
-        #             #for j in range(i):
-        #                 #if j == i: 
-        #                     #continue
-        #                 #else:
-        #                     #loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
-        #             continue
-        #         else:
-        #             loss += loss_function_avg(pointer, words_before[:,indices[i]])
+        else:
+            for i in range(0,len(indices)):
+                if loss_function_avg(output, words_before[:,indices[i]]) == 0:
+                    loss += loss_function_avg(output, words_before[:,indices[i]]) #not loss2
+                    #for j in range(i):
+                        #if j == i: 
+                            #continue
+                        #else:
+                            #loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
+                    continue
+                else:
+                    loss += loss_function_avg(output, words_before[:,indices[i]])
 
 
         data_size += batch_size

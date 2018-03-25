@@ -206,9 +206,9 @@ class CondCopy(nn.Module):
 
             p = prob_ptr + prob_vocab * a[-1].unsqueeze(1).expand_as(prob_vocab)
 
-            probs.append(p)
+            probs = p
 
-            point_scores.append(prob_ptr + a[-1].unsqueeze(1))
+            point_scores = (prob_ptr + a[-1].unsqueeze(1))
 
             s_probs = sum(probs)/len(probs)
 

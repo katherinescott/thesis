@@ -137,6 +137,7 @@ def evaluate(model, data_iter, text_field, args):
 
         #pred_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
         #print(pred_words)
+        print(torch.max(shortlist.data[-1,:]))
         print((shortlist == torch.max(shortlist.data[-1,:])).nonzero()) #.tolist()[0][1])
         #print(text_field.vocab.itos(shortlist == torch.max(shortlist.data[-1,:]).nonzero().tolist()[0][1]))
         # calculate total loss

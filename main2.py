@@ -35,7 +35,7 @@ def train(model, optimizer, data_iter, text_field, args):
         target_words = [text_field.vocab.itos[x] for x in target.data.tolist()]
         #print(target.data.tolist())
         #print target word in the last batch
-        print(target_words[-1])
+        #print(target_words[-1])
 
         batch_size = context.size(0)
 
@@ -121,6 +121,11 @@ def evaluate(model, data_iter, text_field, args):
     for batch in data_iter:
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
+        target_words = [text_field.vocab.itos[x] for x in target.data.tolist()]
+        #print(target.data.tolist())
+        #print target word in the last batch
+        #print(target_words[-1])
+
         batch_size = context.size(0)
 
         words_before = context[:,:-5].cuda() #[:, :-5]
@@ -130,6 +135,8 @@ def evaluate(model, data_iter, text_field, args):
         shortlist = shortlist.cuda()
         #pointer = pointer.cuda()
 
+        pred_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
+        print(pred_words)
 
         # calculate total loss
         loss = loss_function_tot(shortlist, target)  # loss is already averaged

@@ -115,7 +115,8 @@ class CondCopy(nn.Module):
                 self.hidden_size, bias=False)
 
         self.context_layer2 = nn.Linear(
-                self.hidden_size, self.hidden_size, bias=False)
+                self.hidden_size* int(self.context_size/10), 
+                self.hidden_size, bias=False)
         # dot product + bias in the paper
         self.output_shortlist =\
             nn.Linear(self.hidden_size, self.vocab_size) #affine1
@@ -131,7 +132,7 @@ class CondCopy(nn.Module):
 
         self.dropout = nn.Dropout(p=dropout)
 
-        self.copy_vec = Variable(torch.zeros(self.hidden_size, 1), requires_grad=True)
+        #self.copy_vec = Variable(torch.zeros(self.hidden_size, 1), requires_grad=True)
 
     def get_train_parameters(self):
         params = []

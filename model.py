@@ -151,7 +151,9 @@ class CondCopy(nn.Module):
                         self.embedding_layer(to_rescale)))).data
         self.embedding_layer.weight.data[to_rescale.long().data] = scaled
 
-        
+    
+    def reset_hidden(self):
+        self.cvecs = None
 
     def forward(self, context_words):
         self.batch_size = context_words.size(0)
@@ -182,12 +184,12 @@ class CondCopy(nn.Module):
 
             q = F.tanh(self.output_location(cvecs))
 
-            #switch probability
-            #switch = F.sigmoid(self.copy(cvecs))
-            #switch = sum(switch)/len(switch)
+            switch probability
+            switch = F.sigmoid(self.copy(cvecs))
+            switch = sum(switch)/len(switch)
 
             
-            copy_prob = self.copy_vec
+            copy_prob = self.copy_vec*switch
 
             z = []
             for j in range(i+1):
@@ -212,7 +214,9 @@ class CondCopy(nn.Module):
 
             ptr_probs = sum(point_scores)/len(point_scores)
 
-        return torch.log(ptr_probs), torch.log(s_probs)
+        #return torch.log(ptr_probs), torch.log(s_probs)
+
+        return torch.log(torch.cat(point_scores).view(-1, self.vocab_size)), torch.log(torch.cat(probs).view(-1, self.vocab_size))
 
 
 

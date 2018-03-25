@@ -19,6 +19,7 @@ from torch.autograd import Variable
 
 def train(model, optimizer, data_iter, text_field, args):
     model.train()
+    model.reset_hidden()
     loss_function_tot = nn.NLLLoss(size_average=False)
     loss_function_avg = nn.NLLLoss(size_average=True)
     total_loss = 0
@@ -29,7 +30,6 @@ def train(model, optimizer, data_iter, text_field, args):
     batch_idx = 0
     for batch in data_iter:
         #print(batch.text)
-
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
         target_words = [text_field.vocab.itos[x] for x in target.data.tolist()]
@@ -112,6 +112,7 @@ def train(model, optimizer, data_iter, text_field, args):
 
 def evaluate(model, data_iter, text_field, args):
     model.eval()
+    model.reset_hidden()
     loss_function_tot = nn.NLLLoss(size_average=False)
     total_loss = 0
     data_size = 0

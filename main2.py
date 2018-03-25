@@ -217,7 +217,7 @@ def main():
     else:
         raise ValueError('{} is not a valid embedding weight \
                           initializer'.format(args.init_weights))
-    model.output_shortlist.weight.data.uniform_(-0.1, 0.1) #= model.embedding_layer.weight.data
+    model.output_shortlist.weight.data = model.embedding_layer.weight.data
     
     location_dim = (model.hidden_size, model.hidden_size)
     model.output_location.weight.data.uniform_(-0.1, 0.1) #=\
@@ -227,7 +227,7 @@ def main():
     model.copy.weight.data.uniform_(-0.1, 0.1) #=\
         #Tensor(np.random.uniform(size=copy_dim))
 
-    model.copy_vec.data.uniform_(-0.1, 0.1)
+    #model.copy_vec.data.uniform_(-0.1, 0.1)
 
     model.output_shortlist.bias.data.fill_(0)
     model.output_location.bias.data.fill_(0)

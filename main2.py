@@ -135,7 +135,7 @@ def evaluate(model, data_iter, text_field, args):
         shortlist = shortlist.cuda()
         #pointer = pointer.cuda()
 
-        pred_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
+        #pred_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
         #print(pred_words)
 
         print(shortlist)

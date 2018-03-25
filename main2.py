@@ -61,38 +61,38 @@ def train(model, optimizer, data_iter, text_field, args):
         loss = loss_function_avg(shortlist, target)
         total_loss += loss_function_tot(shortlist, target).data.cpu().numpy()[0]
 
-        loss += loss_function_avg(pointer, target)
+        #loss += loss_function_avg(pointer, target)
 
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
         
         
-        # indices = []
-        # for i in range(0,words_before.size(1)):
-        #     if torch.equal(words_before[:,i], target):
-        #         indices.append(i)
+        indices = []
+        for i in range(0,words_before.size(1)):
+            if torch.equal(words_before[:,i], target):
+                indices.append(i)
 
-        # if len(indices) == 0:
-        #     for i in range(0, len(indices)):
-        #         loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
+        if len(indices) == 0:
+            for i in range(0, len(indices)):
+                loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
 
-        # else:
-        #     for i in range(0,len(indices)):
-        #         if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
-        #             loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
-        #             #for j in range(i):
-        #                 #if j == i: 
-        #                     #continue
-        #                 #else:
-        #                     #loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
-        #             continue
-        #         else:
-        #             loss += loss_function_avg(pointer, words_before[:,indices[i]])
+        else:
+            for i in range(0,len(indices)):
+                if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
+                    loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
+                    #for j in range(i):
+                        #if j == i: 
+                            #continue
+                        #else:
+                            #loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
+                    continue
+                else:
+                    loss += loss_function_avg(pointer, words_before[:,indices[i]])
 
 
         data_size += batch_size
         # calculate gradients
-        loss.backward(retain_graph=True)
+        loss.backward()
         nn.utils.clip_grad_norm(model.parameters(), 1)
         #loss2.backward()
         # update parameters

@@ -136,7 +136,9 @@ def evaluate(model, data_iter, text_field, args):
         #pointer = pointer.cuda()
 
         pred_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
-        print(pred_words)
+        #print(pred_words)
+
+        print(shortlist)
 
         # calculate total loss
         loss = loss_function_tot(shortlist, target)  # loss is already averaged

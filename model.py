@@ -161,64 +161,75 @@ class CondCopy(nn.Module):
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
 
-        length = context_words.size(1)
+        #embedding layer
+        embeddings = self.embedding_layer(context_words)
+        # sanity check
+        assert embeddings.size() == \
+            (self.batch_size, int(self.context_size/10), self.hidden_size)
 
-        probs = []
-        hiddens = []
+        embeds2 = F.relu(embeddings)
 
-        cvecs = torch.FloatTensor(self.batch_size, self.hidden_size).fill_(0)
+        assert embeds2.size() == \
+            (self.batch_size, int(self.context_size/10), self.hidden_size)
 
-        cumulate = torch.zeros((length, self.batch_size, self.vocab_size))
-        cumulate.scatter_(2, context_words.transpose(0,1).data.type(torch.LongTensor).unsqueeze(2), 1.0)
+        #get context vectors
+        context_vectors = self.context_layer(embeddings.view(
+                self.batch_size, int(self.context_size/10) * self.hidden_size))
+        context_vectors = self.dropout(context_vectors)
+        assert context_vectors.size() == (self.batch_size, self.hidden_size)
 
-        point_scores = []
+        #context vectors for pointer
+        context_vecs2 = self.context_layer2(embeds2.view(
+                self.batch_size, int(self.context_size/10) * self.hidden_size))
+        context_vecs2 = self.dropout(context_vecs2)
+        assert context_vecs2.size() == (self.batch_size, self.hidden_size)
         
-        for i in range(length):
-            embeddings = self.embedding_layer(context_words.transpose(0,1)[i]) #now its contxt x batch
-            #assert embeddings.size() == \
-                #(int(self.context_size/10), self.batch_size, self.hidden_size)
+        #shortlist softmax
+        shortlist_outputs = self.output_shortlist(context_vectors)
+        assert shortlist_outputs.size() == (self.batch_size, self.vocab_size)
+        s_outputs = F.softmax(shortlist_outputs, dim=1)
+        assert s_outputs.size() == (self.batch_size, self.vocab_size)
 
-            cvecs = self.context_layer2(embeddings) #.view(self.batch_size, int(self.context_size/10) * self.hidden_size))
-            
-            hiddens.append(cvecs)
 
-            q = F.tanh(self.output_location(cvecs))
+        #switch network -- probabililty 
+        switch = (F.sigmoid(self.copy(context_vectors)))
+        switch = sum(switch)/len(switch)
 
-            #switch probability
-            switch = F.sigmoid(self.copy(cvecs))
-            switch = sum(switch)/len(switch)
+        #location softmax
 
-            
-            copy_prob = self.copy_vec*switch
+        l_cvecs = F.tanh(self.output_location(context_vecs2)) 
 
-            z = []
-            for j in range(i+1):
-                z.append(torch.sum(hiddens[j]*q, 1).view(-1))
-            z.append(torch.mm(q, copy_prob).view(-1))
-            z = torch.stack(z)
+        l_cvecs = l_cvecs*switch
 
-            a = F.softmax(z.transpose(0,1), dim=1).transpose(0,1)
-            prefix_matrix = cumulate[:i + 1]
-            prob_ptr = torch.sum(Variable(prefix_matrix) * a[:-1].unsqueeze(2).expand_as(prefix_matrix), 0).squeeze(0)
+        assert l_cvecs.size() == (self.batch_size, self.hidden_size)
 
-            out = self.output_shortlist(cvecs)
-            prob_vocab = F.softmax(out, dim=1)
 
-            p = prob_ptr + prob_vocab * a[-1].unsqueeze(1).expand_as(prob_vocab)
+        #(5) Multiply the output of step (4) by the matrix formed from the 4 context word embeddings (you will likely want to use batch matrix multiply (bmm) 
+            #to accomplish this), to get scores that are batch_size x 4. Then apply a softmax to get a distribution over these preceding words.
 
-            probs.append(p)
+        location_outputs = torch.bmm(embeddings, l_cvecs.view(self.batch_size, self.hidden_size, 1).contiguous())
 
-            point_scores.append(prob_ptr + a[-1].unsqueeze(1))
+        assert location_outputs.size() == (self.batch_size, int(self.context_size/10), 1)
 
-            s_probs = sum(probs)/len(probs)
+        location_outputs = torch.squeeze(location_outputs)
 
-            ptr_probs = sum(point_scores)/len(point_scores)
+        assert location_outputs.size() == (self.batch_size, int(self.context_size/10))
 
-        return torch.log(ptr_probs), torch.log(s_probs)
+        l_outputs = F.softmax(location_outputs, dim=1)
 
-        #return torch.log(torch.cat(point_scores).view(-1, self.vocab_size)), torch.log(torch.cat(probs).view(-1, self.vocab_size))
+        assert l_outputs.size() == (self.batch_size, int(self.context_size/10))
 
-        #return torch.log(torch.cat(prob_ptr + a[-1].unsqueeze(1)).view(-1, self.vocab_size)), torch.log(torch.cat(p).view(-1, self.vocab_size))
+        #6) Now you need to somehow combine the two distributions you formed in steps (3) and (5). I guess the easiest approach is to have another 
+    #distribution that tells you whether you copied or not. Then, p(word5 | ctx) = p(copied) * pointer_probability_of_word5 + (1 - p(copied)) * probability_of_word5_from_step3.  
+    #Note that pointer_probability_of_word5 might be zero. 
 
+        #pre_mat = cumulate 
+
+
+
+        #compute pointer softmax
+        #output = ((switch*l_outputs),  ((1-switch)*s_outputs))
+
+        return torch.log(l_outputs),  torch.log((1-switch)*s_outputs)
 
 

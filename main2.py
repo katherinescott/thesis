@@ -47,9 +47,10 @@ def train(model, optimizer, data_iter, text_field, args):
         optimizer.zero_grad()
         #optimizer2.zero_grad()
         # get output
-        pointer, shortlist = model(context[:,-5:])
-        shortlist = shortlist.cuda()
-        pointer = pointer.cuda()
+        #pointer, shortlist = 
+        output = model(context[:,-5:]).cuda()
+        #shortlist = shortlist.cuda()
+        #pointer = pointer.cuda()
 
         #print(shortlist.data[:,-1].tolist())
         #get shortlist and pointer words, print out the predicted word in the last batch
@@ -58,8 +59,8 @@ def train(model, optimizer, data_iter, text_field, args):
         
         # calculate loss
         #pdb.set_trace()
-        loss = loss_function_avg(shortlist, target)
-        total_loss += loss_function_tot(shortlist, target).data.cpu().numpy()[0]
+        loss = loss_function_avg(output, target)
+        total_loss += loss_function_tot(output, target).data.cpu().numpy()[0]
 
         #loss += loss_function_avg(pointer, target)
 
@@ -67,27 +68,27 @@ def train(model, optimizer, data_iter, text_field, args):
         #then index into 
         
         
-        indices = []
-        for i in range(0,words_before.size(1)):
-            if torch.equal(words_before[:,i], target):
-                indices.append(i)
+        # indices = []
+        # for i in range(0,words_before.size(1)):
+        #     if torch.equal(words_before[:,i], target):
+        #         indices.append(i)
 
-        if len(indices) == 0:
-            for i in range(0, len(indices)):
-                loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
+        # if len(indices) == 0:
+        #     for i in range(0, len(indices)):
+        #         loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
 
-        else:
-            for i in range(0,len(indices)):
-                if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
-                    loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
-                    #for j in range(i):
-                        #if j == i: 
-                            #continue
-                        #else:
-                            #loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
-                    continue
-                else:
-                    loss += loss_function_avg(pointer, words_before[:,indices[i]])
+        # else:
+        #     for i in range(0,len(indices)):
+        #         if loss_function_avg(pointer, words_before[:,indices[i]]) == 0:
+        #             loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
+        #             #for j in range(i):
+        #                 #if j == i: 
+        #                     #continue
+        #                 #else:
+        #                     #loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
+        #             continue
+        #         else:
+        #             loss += loss_function_avg(pointer, words_before[:,indices[i]])
 
 
         data_size += batch_size
@@ -131,8 +132,9 @@ def evaluate(model, data_iter, text_field, args):
         words_before = context[:,:-5].cuda() #[:, :-5]
 
         # get model output
-        pointer, shortlist = model(context[:,-5:])
-        shortlist = shortlist.cuda()
+        #pointer, shortlist = 
+        output = model(context[:,-5:]).cuda()
+        #shortlist = shortlist.cuda()
         #pointer = pointer.cuda()
 
         #pred_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
@@ -141,11 +143,11 @@ def evaluate(model, data_iter, text_field, args):
         #print((shortlist == torch.max(shortlist.data[-1,:])).nonzero().data.tolist()[0][1])
         #print(text_field.vocab.itos[(shortlist == torch.max(shortlist.data[-1,:])).nonzero().data.tolist()[0][1]])
 
-        predicted_words = [text_field.vocab.itos[x] for x in shortlist.data[-1,:]]
-        print(predicted_words)
+        #predicted_words = [text_field.vocab.itos[x] for x in shortlist.data[-1,:]]
+        #print(predicted_words)
 
         # calculate total loss
-        loss = loss_function_tot(shortlist, target)  # loss is already averaged
+        loss = loss_function_tot(output, target)  # loss is already averaged
 
         #indices = []
         #for i in range(0, words_before.size(1)):

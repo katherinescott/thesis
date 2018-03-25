@@ -157,7 +157,7 @@ class CondCopy(nn.Module):
 
     def forward(self, context_words):
         self.batch_size = context_words.size(0)
-        assert context_words.size(1) == int(self.context_size/10), \
+        assert context_words.size(1) == int(self.context_size), \
             "context_words.size()=%s | context_size=%d" % \
             (context_words.size(), self.context_size)
 
@@ -214,11 +214,11 @@ class CondCopy(nn.Module):
 
             ptr_probs = sum(point_scores)/len(point_scores)
 
-        #return torch.log(ptr_probs), torch.log(s_probs)
+        return torch.log(ptr_probs), torch.log(s_probs)
 
         #return torch.log(torch.cat(point_scores).view(-1, self.vocab_size)), torch.log(torch.cat(probs).view(-1, self.vocab_size))
 
-        return torch.log(torch.cat(prob_ptr + a[-1].unsqueeze(1)).view(-1, self.vocab_size)), torch.log(torch.cat(p).view(-1, self.vocab_size))
+        #return torch.log(torch.cat(prob_ptr + a[-1].unsqueeze(1)).view(-1, self.vocab_size)), torch.log(torch.cat(p).view(-1, self.vocab_size))
 
 
 

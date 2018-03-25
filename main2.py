@@ -47,7 +47,7 @@ def train(model, optimizer, data_iter, text_field, args):
         optimizer.zero_grad()
         #optimizer2.zero_grad()
         # get output
-        pointer, shortlist = model(context[:,-5:])
+        pointer, shortlist = model(context) #[:,-5:])
         shortlist = shortlist.cuda()
         pointer = pointer.cuda()
 
@@ -126,7 +126,7 @@ def evaluate(model, data_iter, text_field, args):
         words_before = context[:,:-5].cuda() #[:, :-5]
 
         # get model output
-        pointer, shortlist = model(context[:,-5:])
+        pointer, shortlist = model(context) #[:,-5:])
         shortlist = shortlist.cuda()
         #pointer = pointer.cuda()
 

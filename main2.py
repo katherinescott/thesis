@@ -51,9 +51,9 @@ def train(model, optimizer, data_iter, text_field, args):
         #optimizer2.zero_grad()
         # get output
         #pointer, shortlist = 
-        output = model(context).cuda() #[:, :-5]
-        #shortlist = shortlist.cuda()
-        #pointer = pointer.cuda()
+        output, pointer = model(context) #[:, :-5]
+        output = output.cuda()
+        pointer = pointer.cuda()
 
         #print(shortlist.data[:,-1].tolist())
         #get shortlist and pointer words, print out the predicted word in the last batch
@@ -70,28 +70,31 @@ def train(model, optimizer, data_iter, text_field, args):
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
         
-        
+        pointer_target = target.data
         indices = []
-        for i in range(0,words_before.size(1)):
-            if torch.equal(words_before[:,i], target):
-                indices.append(i)
+        for i in range(0,words_before.size(0)):
+            if(target[i] in words_before[i,:]):
+                continue
+            else: loss += loss_function_avg(pointer[i,:].transpose(0,1), target[i])
 
-        if len(indices) == 0:
-            for i in range(0, len(indices)):
-                loss += loss_function_avg(pointer, words_before[:,indices[i]]) #not loss2
+        #loss += loss_function_avg(output[:,-5:], )
 
-        else:
-            for i in range(0,len(indices)):
-                if loss_function_avg(output, words_before[:,indices[i]]) == 0:
-                    loss += loss_function_avg(output, words_before[:,indices[i]]) #not loss2
-                    #for j in range(i):
-                        #if j == i: 
-                            #continue
-                        #else:
-                            #loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
-                    continue
-                else:
-                    loss += loss_function_avg(output, words_before[:,indices[i]])
+        # if len(indices) == 0:
+        #     for i in range(0, len(indices)):
+        #         loss += loss_function_avg(output, words_before[:,indices[i]]) #not loss2
+
+        # else:
+        #     for i in range(0,len(indices)):
+        #         if loss_function_avg(output, words_before[:,indices[i]]) == 0:
+        #             loss += loss_function_avg(output, words_before[:,indices[i]]) #not loss2
+        #             #for j in range(i):
+        #                 #if j == i: 
+        #                     #continue
+        #                 #else:
+        #                     #loss -= loss_function_avg(pointer, words_before[:,indices[j]]) #not loss2
+        #             continue
+        #         else:
+        #             loss += loss_function_avg(output, words_before[:,indices[i]])
 
 
         data_size += batch_size
@@ -104,7 +107,7 @@ def train(model, optimizer, data_iter, text_field, args):
         # enforce the max_norm constraint
         #model.max_norm_embedding()
         # skip the last batch
-        if batch_idx >=1: # iter_len - 2:
+        if batch_idx >= iter_len - 2:
             break
 
         batch_idx += 1
@@ -135,8 +138,8 @@ def evaluate(model, data_iter, text_field, args):
 
         # get model output
         #pointer, shortlist = 
-        output = model(context).cuda() #[:,-5:]
-        #shortlist = shortlist.cuda()
+        output, _ = model(context) #[:,-5:]
+        output = output.cuda()
         #pointer = pointer.cuda()
 
         #pred_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]

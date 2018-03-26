@@ -70,10 +70,9 @@ def train(model, optimizer, data_iter, text_field, args):
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
         
-        pointer_target = target.data
         indices = []
         for i in range(0,words_before.size(0)):
-            if(target[i] in words_before[i,:]):
+            if(target.data.tolist()[0][i] in words_before.data.tolist()[i]):
                 continue
             else: loss += loss_function_avg(pointer[i,:].transpose(0,1), target[i])
 

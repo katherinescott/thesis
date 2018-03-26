@@ -72,7 +72,8 @@ def train(model, optimizer, data_iter, text_field, args):
         
         print(target.data.tolist()[0])
         print(words_before.data.tolist()[1])
-        print(loss_function_avg(pointer[0,:], target[0]))
+        print(pointer[0:,])
+        print(target[0])
 
         # indices = []
         # for i in range(0,words_before.size(0)):

@@ -72,7 +72,7 @@ def train(model, optimizer, data_iter, text_field, args):
         
         #print(target.data.tolist()[0])
         #print(words_before.data.tolist()[1])
-        print(pointer[0])
+        print(pointer)
         #print(target[0])
 
         # indices = []

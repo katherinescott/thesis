@@ -37,8 +37,8 @@ def train(model, optimizer, data_iter, text_field, args):
         #print target word in the last batch
         #print(target_words[-1])
 
-        print(context)
-        print(target)
+        #print(context)
+        #print(target)
 
         batch_size = context.size(0)
 
@@ -70,11 +70,14 @@ def train(model, optimizer, data_iter, text_field, args):
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
         
-        indices = []
-        for i in range(0,words_before.size(0)):
-            if(target.data.tolist()[0][i] in words_before.data.tolist()[i]):
-                continue
-            else: loss += loss_function_avg(pointer[i,:].transpose(0,1), target[i])
+        print(target.data.tolist()[0][i])
+        print(words_before.data.tolist()[i])
+
+        # indices = []
+        # for i in range(0,words_before.size(0)):
+        #     if(target.data.tolist()[0][i] in words_before.data.tolist()[i]):
+        #         continue
+        #     else: loss += loss_function_avg(pointer[i,:].transpose(0,1), target[i])
 
         #loss += loss_function_avg(output[:,-5:], )
 

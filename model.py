@@ -233,6 +233,6 @@ class CondCopy(nn.Module):
 
         #return torch.log(l_outputs),  torch.log((1-switch)*s_outputs)
 
-        return output
+        return output, switch*l_outputs
 
 

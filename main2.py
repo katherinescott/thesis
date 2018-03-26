@@ -70,10 +70,10 @@ def train(model, optimizer, data_iter, text_field, args):
         #50 context words, use last 5 as context, previous as pointers then look in the 50 context words and see if target was in them, find that index,
         #then index into 
         
-        print(target.data.tolist()[0])
-        print(words_before.data.tolist()[1])
-        print(pointer[0:,])
-        print(target[0])
+        #print(target.data.tolist()[0])
+        #print(words_before.data.tolist()[1])
+        print(pointer[0])
+        #print(target[0])
 
         # indices = []
         # for i in range(0,words_before.size(0)):

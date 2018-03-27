@@ -34,7 +34,7 @@ parser.add_argument("--init_weights",
                     type=str, default="rand_norm")
 parser.add_argument("--resume",
                     help="Load model instead of training completely new model",
-                    type=str, default="models/2018-3-26-10-42-epoch15")
+                    type=str, default="2018-3-26-10-42-epoch15")
 parser.add_argument("--start_epoch", help="Starting epoch number",
                     type=int, default=0)  # will be overwritten
 parser.add_argument("--model_dir", help="Models Directory",

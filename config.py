@@ -15,7 +15,7 @@ parser.add_argument("--GPU",
                     help="use GPU optimizer (1 to use GPU, 0 for no GPU)",
                     type=int, default=0)
 parser.add_argument("--mode", help="specify test, validate, or train",
-                    type=str, default="test")
+                    type=str, default="train")
 parser.add_argument("--lr", help="learning rate",
                     type=float, default=0.001)
 parser.add_argument("--adapt_lr_epoch",

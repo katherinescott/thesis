@@ -32,9 +32,10 @@ def train(model, optimizer, data_iter, text_field, args):
         #print(batch.text)
         context = torch.transpose(batch.text, 0, 1)
         target = (batch.target[-1, :]).cuda()
-        target_words = [text_field.vocab.itos[x] for x in target.data.tolist()]
+        #target_words = [text_field.vocab.itos[x] for x in target.data.tolist()]
         #print(target.data.tolist())
         #print target word in the last batch
+        #print("target word")
         #print(target_words[-1])
 
         #print(context)
@@ -51,7 +52,7 @@ def train(model, optimizer, data_iter, text_field, args):
         #optimizer2.zero_grad()
         # get output
         #pointer, shortlist = 
-        output, pointer = model(context) #[:, :-5]
+        output, pointer, _ = model(context) #[:, :-5]
         output = output.cuda()
         pointer = pointer.cuda()
 
@@ -142,7 +143,8 @@ def evaluate(model, data_iter, text_field, args):
         target_words = [text_field.vocab.itos[x] for x in target.data.tolist()]
         #print(target.data.tolist())
         #print target word in the last batch
-        #print(target_words[-1])
+        print("target word")
+        print(target_words[-1])
 
         batch_size = context.size(0)
 
@@ -150,12 +152,13 @@ def evaluate(model, data_iter, text_field, args):
 
         # get model output
         #pointer, shortlist = 
-        output, _ = model(context) #[:,-5:]
+        output, _, probs= model(context) #[:,-5:]
         output = output.cuda()
+        probs = probs.cuda()
         #pointer = pointer.cuda()
 
-        #pred_words = [text_field.vocab.itos[x] for x in shortlist.data[:,-1].tolist()]
-        #print(pred_words)
+        pred_words = [text_field.vocab.itos[x] for x in probs.data[:,-1].tolist()]
+        print(pred_words)
         #print(torch.max(shortlist.data[-1,:]))
         #print((shortlist == torch.max(shortlist.data[-1,:])).nonzero().data.tolist()[0][1])
         #print(text_field.vocab.itos[(shortlist == torch.max(shortlist.data[-1,:])).nonzero().data.tolist()[0][1]])
@@ -207,8 +210,8 @@ def evaluate(model, data_iter, text_field, args):
 
 def main():
     train_iter, val_iter, test_iter, text_field = utils.load_ptb(
-        ptb_path='data3.zip',
-        ptb_dir='data3',
+        ptb_path='data.zip',
+        ptb_dir='data',
         bptt_len=args.context_size,
         batch_size=args.batch_size,
         gpu=args.GPU,

@@ -157,10 +157,10 @@ def evaluate(model, data_iter, text_field, args):
         probs = probs.cuda()
         #pointer = pointer.cuda()
 
-        pred_words = [text_field.vocab.itos[x] for x in probs.data[:,-1].tolist()]
-        print(pred_words)
-        #print(torch.max(shortlist.data[-1,:]))
-        #print((shortlist == torch.max(shortlist.data[-1,:])).nonzero().data.tolist()[0][1])
+        #pred_words = [text_field.vocab.itos[x] for x in probs.data[:,-1].tolist()]
+        #print(pred_words)
+        print(torch.max(probs.data[-1,:]))
+        print((shortlist == torch.max(shortlist.data[-1,:])).nonzero().data.tolist()[0][1])
         #print(text_field.vocab.itos[(shortlist == torch.max(shortlist.data[-1,:])).nonzero().data.tolist()[0][1]])
 
         #predicted_words = [text_field.vocab.itos[x] for x in shortlist.data[-1,:]]

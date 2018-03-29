@@ -52,7 +52,7 @@ def train(model, optimizer, data_iter, text_field, args):
         #optimizer2.zero_grad()
         # get output
         #pointer, shortlist = 
-        output, pointer, _ = model(context) #[:, :-5]
+        output, pointer, probs = model(context) #[:, :-5]
         output = output.cuda()
         pointer = pointer.cuda()
 
@@ -152,7 +152,7 @@ def evaluate(model, data_iter, text_field, args):
 
         # get model output
         #pointer, shortlist = 
-        output, _, probs= model(context) #[:,-5:]
+        output, pointer, probs= model(context) #[:,-5:]
         output = output.cuda()
         probs = probs.cuda()
         #pointer = pointer.cuda()
